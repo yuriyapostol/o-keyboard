@@ -1,0 +1,179 @@
+.keyboard {
+  box-sizing: border-box;
+  padding: 1%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #161616;
+  background: #e4e4e4;
+  font-family: "Inter", Helvetica, Arial, sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  --key-width: 0.1;
+  --key-face-fill: #fff;
+  --key-face-fill-hover: color-mix(in srgb, var(--key-face-fill), black 5%);
+  --key-face-fill-pressed: color-mix(in srgb, var(--key-face-fill), black 20%);
+  --key-face-fill-hilighted: #fff385;
+  --key-face-fill-hilighted-hover: color-mix(in srgb, var(--key-face-fill-hilighted), black 5%);
+  --key-face-fill-hilighted-pressed: color-mix(in srgb, var(--key-face-fill-hilighted), black 20%);
+}
+.keyboard * {
+  box-sizing: border-box;
+}
+.keyboard input,
+.keyboard button {
+  font-family: inherit;
+  font-size: inherit;
+}
+.keyrow {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.keycolumn {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+.key {
+  position: relative;
+  width: calc(100% * var(--key-width, 1));
+  padding-bottom: calc(150% * var(--key-width, 1));
+  height: 0;
+}
+.key.key-disabled {
+  opacity: 0.3;
+}
+.key button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.key.key-disabled button {
+  cursor: default;
+}
+.key button:focus {
+  outline-width: 1px;
+  outline-style: dotted;
+}
+.key button svg {
+  width: 100%;
+}
+.key button svg .key-label {
+  transform: translate(50%, 52%);
+  font-size: 65px;
+}
+.key button svg .key-label tspan {
+  text-align: center;
+  text-anchor: middle;
+  alignment-baseline: middle;
+  font-size: 1em;
+  font-weight: 400;
+}
+.key button svg .key-alt-label {
+  transform: translate(50%, 80%);
+  font-size: 30px;
+}
+.key button svg .key-alt-label tspan {
+  text-align: center;
+  text-anchor: middle;
+  alignment-baseline: middle;
+  font-size: 1em;
+  font-weight: 400;
+  opacity: 1;
+}
+.key button svg .key-alt-label-1 {
+  transform: translate(15%, 21%);
+}
+.key button svg .key-alt-label-1 tspan {
+  text-align: start;
+  text-anchor: start;
+}
+.key button svg .key-alt-label-2 {
+  transform: translate(85%, 21%);
+}
+.key button svg .key-alt-label-2 tspan {
+  text-align: end;
+  text-anchor: end;
+}
+.key button svg .key-alt-label-3 {
+  transform: translate(85%, 79%);
+}
+.key button svg .key-alt-label-3 tspan {
+  text-align: end;
+  text-anchor: end;
+}
+.key button svg .key-alt-label-4 {
+  transform: translate(15%, 79%);
+}
+.key button svg .key-alt-label-4 tspan {
+  text-align: start;
+  text-anchor: start;
+}
+.key button svg .key-alt-label-5 {
+  transform: translate(50%, 20%);
+}
+.key button svg .key-alt-label-6 {
+  transform: translate(85%, 52%);
+}
+.key button svg .key-alt-label-6 tspan {
+  text-align: end;
+  text-anchor: end;
+}
+.key button svg .key-alt-label-8 {
+  transform: translate(15%, 52%);
+}
+.key button svg .key-alt-label-8 tspan {
+  text-align: start;
+  text-anchor: start;
+}
+.key button svg .key-face {
+  fill: var(--key-face-fill);
+  x: 5px;
+  y: 11px;
+  width: 90px;
+  height: 126px;
+  rx: 12px;
+  ry: 12px;
+}
+.key.key-pressed button svg .key-face {
+  fill: var(--key-face-fill-pressed);
+}
+.key.key-hilighted button svg .key-face {
+  fill: var(--key-face-fill-hilighted);
+}
+.key button svg .key-shadow {
+  fill: #000;
+  opacity: 0.5;
+  x: 5px;
+  y: 13px;
+  width: 90px;
+  height: 126px;
+  rx: 12px;
+  ry: 12px;
+}
+.key button:hover svg .key-face {
+  fill: var(--key-face-fill-hover);
+}
+.key.key-disabled button:hover svg .key-face {
+  fill: var(--key-face-fill);
+}
+.key.key-hilighted button:hover svg .key-face {
+  fill: var(--key-face-fill-hilighted-hover);
+}
+.key.key-pressed button svg .key-face {
+  fill: var(--key-face-fill-pressed);
+}
+.key.key-hilighted.key-pressed button svg .key-face {
+  fill: var(--key-face-fill-hilighted-pressed);
+}

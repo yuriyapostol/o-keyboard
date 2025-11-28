@@ -1,0 +1,54 @@
+{
+  "name": "o-keyboard",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Virtual Keyboard for Javascript – Modern, customizable and lightweight.",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./data/layouts": {
+      "import": "./dist/data/layouts.js",
+      "require": "./dist/data/layouts.cjs"
+    },
+    "./data/tables": {
+      "import": "./dist/data/tables.js",
+      "require": "./dist/data/tables.cjs"
+    },
+    "./data/phoneticAlphabets": {
+      "import": "./dist/data/phoneticAlphabets.js",
+      "require": "./dist/data/phoneticAlphabets.cjs"
+    }
+  },
+  "files": [
+    "dist/",
+    "types/"
+  ],
+  "scripts": {
+    "build:esm": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --metafile=dist/meta.json",
+    "build:cjs": "esbuild src/index.js --bundle --format=cjs --outfile=dist/index.cjs",
+    "build:data:esm": "esbuild src/data/layouts.js --bundle --format=esm --outfile=dist/data/layouts.js && esbuild src/data/tables.js --bundle --format=esm --outfile=dist/data/tables.js && esbuild src/data/phoneticAlphabets.js --bundle --format=esm --outfile=dist/data/phoneticAlphabets.js",
+    "build:data:cjs": "esbuild src/data/layouts.js --bundle --format=cjs --outfile=dist/data/layouts.cjs && esbuild src/data/tables.js --bundle --format=cjs --outfile=dist/data/tables.cjs && esbuild src/data/phoneticAlphabets.js --bundle --format=cjs --outfile=dist/data/phoneticAlphabets.cjs",
+    "build": "npm run build:esm && npm run build:cjs && npm run build:data:esm && npm run build:data:cjs",
+    "minify": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.min.js",
+    "dist": "npm run build && npm run minify && node ./scripts/copy-types.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yuriyapostol/o-keyboard.git"
+  },
+  "keywords": [
+    "keyboard",
+    "on-screen",
+    "ui"
+  ],
+  "author": "Yuriy Apostol",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.27.0"
+  }
+}
