@@ -71,6 +71,18 @@ export class OKeyboard {
     const letterLabelIndex = labels.findIndex(l => l.type === "letter");
     if (!layout.rows) layout.rows = [];
 
+    for (let i = 0, row = 0; i < layout.keys.length; i++) {
+      if (typeof layout.keys[i] === "string") {
+        layout.keys[i] = { letter: layout.keys[i] };
+        if (row) layout.keys[i].row = row;
+      }
+      else if (Array.isArray(layout.keys[i])) {
+        const l = layout.keys[i].length;
+        layout.keys.splice(i, 1, ...(layout.keys[i]).map(k => { k = { letter: k }; if (row) k.row = row; return k; }));
+        i += l - 1;
+        row++;
+      }
+    }
     layout.keys.forEach(key => {
       if (!key) key = {};
       const keyLetter = labels[letterLabelIndex]?.tableData?.letters?.find(l => l.letter === key.letter);
@@ -99,8 +111,8 @@ export class OKeyboard {
         } else {
           if (!Array.isArray(key.labels[i])) key.labels[i] = [key.labels[i]];
         }
-        key.labels[i].map(t => {
-          if (labels[i].type === "letter") t = ((t && labels[i].tableData?.letters?.filter(l => l.letter === t)) || labels[i].tableData?.letters?.filter(l => l.code === key.code && l.letter !== key.letter))?.map(l => tCaseFunc(l.letter)).join("</tspan><tspan> </tspan><tspan>") || "";
+        key.labels[i] = key.labels[i].map(t => {
+          if (labels[i].type === "letter") t = ((t && labels[i].tableData?.letters?.filter(l => (Array.isArray(t))? t.flat(2).includes(l.letter): l.letter === t)) || labels[i].tableData?.letters?.filter(l => l.code === key.code && l.letter !== key.letter))?.map(l => tCaseFunc(l.letter)).join("</tspan><tspan> </tspan><tspan>") || "";
           else if (labels[i].type === "phoneticAlphabet") t = labels[i].phoneticData?.letters?.find(l => l.letter === (t || key.letter))?.name || t || "";
           return t;
         });

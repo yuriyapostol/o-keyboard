@@ -29,12 +29,12 @@
     "types/"
   ],
   "scripts": {
-    "build:esm": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --metafile=dist/meta.json",
-    "build:cjs": "esbuild src/index.js --bundle --format=cjs --outfile=dist/index.cjs",
+    "build:esm": "esbuild src/index.js --bundle --format=esm --outfile=dist/keyboard.js --metafile=dist/meta.json",
+    "build:cjs": "esbuild src/index.js --bundle --format=cjs --outfile=dist/keyboard.cjs",
     "build:data:esm": "esbuild src/data/layouts.js --bundle --format=esm --outfile=dist/data/layouts.js && esbuild src/data/tables.js --bundle --format=esm --outfile=dist/data/tables.js && esbuild src/data/phoneticAlphabets.js --bundle --format=esm --outfile=dist/data/phoneticAlphabets.js",
     "build:data:cjs": "esbuild src/data/layouts.js --bundle --format=cjs --outfile=dist/data/layouts.cjs && esbuild src/data/tables.js --bundle --format=cjs --outfile=dist/data/tables.cjs && esbuild src/data/phoneticAlphabets.js --bundle --format=cjs --outfile=dist/data/phoneticAlphabets.cjs",
     "build": "npm run build:esm && npm run build:cjs && npm run build:data:esm && npm run build:data:cjs",
-    "minify": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.min.js",
+    "minify": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/keyboard.min.js",
     "dist": "npm run build && npm run minify && node ./scripts/copy-types.cjs"
   },
   "repository": {
