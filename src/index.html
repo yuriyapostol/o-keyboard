@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+  <title>Morse Trainer</title>
+  <!--link rel="icon" type="image/png" sizes="32x32" href="<%= config.baseUrl %>images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="<%= config.baseUrl %>images/icon-256x256.png"-->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html {
+      height: 100%;
+    }
+    body {
+      font-family: "Inter", Helvetica, Arial, sans-serif;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 16px;
+      padding: 0;
+      margin: 0;
+      color: #101a28;
+      background: #fff;
+      height: 100%;
+    }
+    input,
+    textarea,
+    button,
+    select {
+      font-family: inherit;
+      font-size: inherit;
+    }
+    a {
+      color: #0087d4;
+    }
+    .hidden {
+      display: none !important;
+    }
+    @media (max-width: 480px) {
+      .no-mobile {
+        display: none !important;
+      }
+    }
+  </style>
+
+  <link rel="stylesheet" href="keyboard.css">
+</head>
+
+<body lang="en">
+  <div class="keyboard"></div>
+
+  <script type="module">
+
+    import { OKeyboard, layouts, tables } from "./index.js";
+
+    let keyboard = new OKeyboard({
+      container: '.keyboard',
+      layout: layouts[0],
+      tables,
+      maxRowKeys: 12,
+      maxColumnKeys: 12,
+      onKeyDown: (key) => {
+        const table = tables.find(t => t.id === keyboard.layout.labels.find(l => l.type === "letter" && !l.position).table);
+        const letter = table.letters.find(l => l.letter === key.letter);
+        console.log(letter)
+        if (letter && letter.code) {
+          playMorseCode(letter.code);
+        }
+      },
+    });
+
+    console.log(keyboard);
+
+
+    const dotDuration = 0.1,
+      dashDuration = 3 * dotDuration,
+      interElementGap = dotDuration,
+      shortGap = 3 * dotDuration,
+      mediumGap = 7 * dotDuration;
+
+    const envelopeDuration = 0.005;
+    
+    const curveInArray = new Float32Array(11);
+    curveInArray[0] = 0;
+    curveInArray[1] = 0.01462;
+    curveInArray[2] = 0.0645;
+    curveInArray[3] = 0.16003;
+    curveInArray[4] = 0.30886;
+    curveInArray[5] = 0.5;
+    curveInArray[6] = 0.69114;
+    curveInArray[7] = 0.83997;
+    curveInArray[8] = 0.9355;
+    curveInArray[9] = 0.98538;
+    curveInArray[10] = 1;
+
+    const curveOutArray = new Float32Array(11);
+    curveOutArray[0] = 1;
+    curveOutArray[1] = 0.98538;
+    curveOutArray[2] = 0.9355;
+    curveOutArray[3] = 0.83997;
+    curveOutArray[4] = 0.69114;
+    curveOutArray[5] = 0.5;
+    curveOutArray[6] = 0.30886;
+    curveOutArray[7] = 0.16003;
+    curveOutArray[8] = 0.0645;
+    curveOutArray[9] = 0.01462;
+    curveOutArray[10] = 0;
+
+    let audioContext;
+    let endTime;
+
+    // Функція для створення та запуску білого шуму
+    function createWhiteNoise() {
+      const bufferSize = audioContext.sampleRate * 3;  // 1 секунда
+      const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+
+      // Заповнення буфера випадковими значеннями для створення білого шуму
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;  // Випадкові значення між -1 і 1
+      }
+
+      const whiteNoise = audioContext.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;  // Запускаємо шум у циклі
+
+      const gainNode = audioContext.createGain();
+      gainNode.gain.value = 0.002;  // Налаштування гучності шуму (можна змінити на смак)
+
+      whiteNoise.connect(gainNode).connect(audioContext.destination);
+      whiteNoise.start();
+    }
+
+    function playTone(duration) {
+      if (! audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        endTime = audioContext.currentTime;
+        createWhiteNoise();
+      }
+      else if (audioContext.state === "suspended") audioContext.resume();
+
+      if (endTime < audioContext.currentTime) endTime = audioContext.currentTime;
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(700, endTime);
+
+      // З'єднуємо осцилятор з gainNode і потім на вихід
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      // Налаштовуємо огинаючу (плавне зростання і згасання звуку)
+      gainNode.gain.setValueAtTime(0, endTime);  // Початковий рівень гучності 0
+      //gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + envelopeDuration);  // Атака
+      gainNode.gain.setValueCurveAtTime(curveInArray, endTime, envelopeDuration);  // Атака
+      gainNode.gain.setValueAtTime(1, endTime + duration - envelopeDuration);  // Підтримка
+      //gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration / 1000);  // Згасання
+      gainNode.gain.setValueCurveAtTime(curveOutArray, endTime + duration - envelopeDuration, envelopeDuration);  // Згасання
+
+      oscillator.start(endTime);
+      oscillator.stop(endTime + duration);
+      endTime += duration + interElementGap;
+    }
+
+    function playMorseCode(code) {
+      if (code) {
+        for (let symbol of code) {
+          if (symbol === '.') playTone(dotDuration);
+          else if (symbol === '-') playTone(dashDuration);
+        }
+        endTime += shortGap;
+      }
+    }
+  </script>
+</body>

@@ -4,7 +4,6 @@ export class OKeyboard {
    *  - container: DOM element where keyboard will be rendered (required)
    *  - layout: layout object (required)
    *  - tables: tables array (required for letter lookups)
-   *  - phoneticAlphabets: phonetic alphabets array (optional)
    *  - onKeyDown: function(key) called on mouse down or physical key down
    *  - onKeyUp: function(key) called on mouse up or physical key up
    *  - onPress: function(key) called when a physical keyboard key is pressed
@@ -20,7 +19,6 @@ export class OKeyboard {
     this.layout = JSON.parse(JSON.stringify(options.layout));
     
     this.tables = options.tables || [];
-    this.phoneticAlphabets = options.phoneticAlphabets || [];
 
     this.onKeyDown = options.onKeyDown || (() => {});
     this.onKeyUp = options.onKeyUp || (() => {});
@@ -57,12 +55,12 @@ export class OKeyboard {
       labels[i] = { ...(layout.labels?.[i] || {}) };
       labels[i].position = labelPositions[i];
       if (!labels[i].type) labels[i].type = "undefined";
-      if (labels[i].type === "letter" && labels[i].table) {
+      if ((labels[i].type === "letter" || labels[i].type === "phonetic-alphabet") && labels[i].table) {
         labels[i].tableData = this.tables.find(t => t.id === labels[i].table);
       }
-      if (labels[i].type === "phoneticAlphabet" && labels[i].name) {
-        labels[i].phoneticData = this.phoneticAlphabets.find(t => t.name === labels[i].name);
-      }
+      //if (labels[i].type === "phonetic-alphabet" && labels[i].table) {
+      //  labels[i].phoneticData = this.tables.find(t => t.type == labels[i].type && t.id === labels[i].name);
+      //}
       if (labels[i].size) {
         styles.push(`.key button svg .${labels[i].position ? 'key-alt-label-' + labels[i].position : 'key-label'} tspan { font-size: ${labels[i].size}em; }`);
       }
@@ -85,7 +83,7 @@ export class OKeyboard {
     }
     layout.keys.forEach(key => {
       if (!key) key = {};
-      const keyLetter = labels[letterLabelIndex]?.tableData?.letters?.find(l => l.letter === key.letter);
+      const keyLetter = labels[letterLabelIndex]?.tableData?.values?.find(l => l.key === key.letter);
       if (!key.code) key.code = keyLetter?.code;
       if (!key.labels) key.labels = [];
 
@@ -100,7 +98,7 @@ export class OKeyboard {
         if (!key.labels[i]) {
           key.labels[i] = [];
           if (i === letterLabelIndex) key.labels[i] = [tCaseFunc(key.letter)];
-          else if (labels[i].type === "letter") key.labels[i] = labels[i].tableData?.letters?.filter(l => l.code === key.code && l.letter !== key.letter)?.map(l => tCaseFunc(l.letter));
+          else if (labels[i].type === "letter") key.labels[i] = labels[i].tableData?.values?.filter(l => l.code === key.code && l.letter !== key.letter)?.map(l => tCaseFunc(l.letter));
           else if (labels[i].type === "phoneticAlphabet") {
             let f = labels[i].phoneticData?.letters?.find(l => l.letter === key.letter);
             if (f) {
@@ -111,7 +109,7 @@ export class OKeyboard {
         } else {
           if (!Array.isArray(key.labels[i])) key.labels[i] = [key.labels[i]];
         }
-        key.labels[i] = key.labels[i].map(t => {
+        key.labels[i] = key.labels[i]?.map(t => {
           if (labels[i].type === "letter") t = ((t && labels[i].tableData?.letters?.filter(l => (Array.isArray(t))? t.flat(2).includes(l.letter): l.letter === t)) || labels[i].tableData?.letters?.filter(l => l.code === key.code && l.letter !== key.letter))?.map(l => tCaseFunc(l.letter)).join("</tspan><tspan> </tspan><tspan>") || "";
           else if (labels[i].type === "phoneticAlphabet") t = labels[i].phoneticData?.letters?.find(l => l.letter === (t || key.letter))?.name || t || "";
           return t;
@@ -146,7 +144,7 @@ export class OKeyboard {
           let keyHTML = "";
           for (let i = 0; i < labelsLength; i++) {
             keyHTML += `<text class="${labels[i].position? 'key-alt-label key-alt-label-' + labels[i].position: 'key-label'}">` +
-              key.labels[i].map((t, j) => `<tspan${labels[i].direction === "column"? ' x="0" dy="' + ((j? 1: 1 - key.labels[i].length) * 30 * 1.1 * labels[i].size).toFixed(1) + '"': (j? ' dx="' + (30 * 0.2 * labels[i].size).toFixed(1) + '"': '')}>${t}</tspan>`).join("") +
+              key.labels[i]?.map((t, j) => `<tspan${labels[i].direction === "column"? ' x="0" dy="' + ((j? 1: 1 - key.labels[i].length) * 30 * 1.1 * labels[i].size).toFixed(1) + '"': (j? ' dx="' + (30 * 0.2 * labels[i].size).toFixed(1) + '"': '')}>${t}</tspan>`).join("") +
               `</text>`;
           }
           html += `<div class="key${key.hilighted? ' key-hilighted': ''}${key.disabled? ' key-disabled': ''}" data-key="${key.letter}">` +
