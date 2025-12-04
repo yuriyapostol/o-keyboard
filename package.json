@@ -31,7 +31,7 @@
     "build:data:cjs": "esbuild src/data/layouts/*.js --bundle=false --format=cjs --outdir=dist/data/layouts && esbuild src/data/tables/**/*.js --bundle=false --format=cjs --outdir=dist/data/tables",
     "build": "npm run build:esm && npm run build:cjs && npm run build:data:esm && npm run build:data:cjs",
     "minify": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.min.js",
-    "dist": "npm run build && npm run minify && node ./scripts/copy-types.cjs && node ./scripts/copy-html.cjs"
+    "dist": "npm run build && npm run minify && node ./scripts/copy-types.cjs && node ./scripts/copy-static.cjs"
   },
   "repository": {
     "type": "git",

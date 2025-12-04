@@ -18,7 +18,7 @@ export class OKeyboard {
     if (!options.layout) throw new Error("OKeyboard: layout is required");
     this.layout = JSON.parse(JSON.stringify(options.layout));
     
-    this.tables = options.tables || [];
+    this.tables = options.tables? JSON.parse(JSON.stringify(options.tables)): [];
 
     this.onKeyDown = options.onKeyDown || (() => {});
     this.onKeyUp = options.onKeyUp || (() => {});
@@ -41,9 +41,16 @@ export class OKeyboard {
 
   // ----- render and helpers -----
   render() {
-    const layout = this.layout;
-    const labelsLength = layout.labels?.length || 9;
-    const labelPositions = layout.labels?.map(l => parseInt(l?.position)) || [];
+    this.tables.forEach(t => {
+      if (!t.values) t.values = [];
+      t.values.forEach(v => {
+        if (typeof v === "string") v = { key: v };
+        if (typeof v.value === "undefined") v.value = v.key;
+      });
+    });
+
+    const labelsLength = this.layout.labels?.length || 9;
+    const labelPositions = this.layout.labels?.map(l => parseInt(l?.position) || 0) || [];
     const labels = [];
     const styles = [];
     let html = "";
@@ -52,14 +59,14 @@ export class OKeyboard {
     for (let i = 0, j = 0; i < labelsLength; i++) {
       while (labelPositions.includes(j)) j++;
       if (typeof labelPositions[i] !== "number") labelPositions[i] = j;
-      labels[i] = { ...(layout.labels?.[i] || {}) };
+      labels[i] = this.layout.labels?.[i] || {};
       labels[i].position = labelPositions[i];
       if (!labels[i].type) labels[i].type = "undefined";
       else if (labels[i].tableName) {
-        labels[i].table = this.tables.find(t => t.type == labels[i].type && t.name === labels[i].tableName);
+        labels[i].table = this.tables.find(t => t.type === labels[i].type && t.name === labels[i].tableName);
       }
       if (labels[i].keyCode && labels[i].keyCode.type && labels[i].keyCode.tableName) {
-        labels[i].keyCode.table = this.tables.find(t => t.type == labels[i].keyCode.type && t.name === labels[i].keyCode.tableName);
+        labels[i].keyCode.table = this.tables.find(t => t.type === labels[i].keyCode.type && t.name === labels[i].keyCode.tableName);
       }
       if (labels[i].size) {
         styles.push(`.key button svg .${labels[i].position ? 'key-alt-label-' + labels[i].position : 'key-label'} tspan { font-size: ${labels[i].size}em; }`);
@@ -71,21 +78,21 @@ export class OKeyboard {
 
     const keyCodeTable = labels.find(l => l.keyCode)?.keyCode?.table;
     
-    if (!layout.rows) layout.rows = [];
+    if (!this.layout.rows) this.layout.rows = [];
 
-    for (let i = 0, row = 0; i < layout.keys.length; i++) {
-      if (typeof layout.keys[i] === "string") {
-        layout.keys[i] = { key: layout.keys[i] };
-        if (row) layout.keys[i].row = row;
+    for (let i = 0, row = 0; i < this.layout.keys.length; i++) {
+      if (typeof this.layout.keys[i] === "string") {
+        this.layout.keys[i] = { key: this.layout.keys[i] };
+        if (row) this.layout.keys[i].row = row;
       }
-      else if (Array.isArray(layout.keys[i])) {
-        const l = layout.keys[i].length;
-        layout.keys.splice(i, 1, ...(layout.keys[i]).map(k => { k = { key: k }; if (row) k.row = row; return k; }));
+      else if (Array.isArray(this.layout.keys[i])) {
+        const l = this.layout.keys[i].length;
+        this.layout.keys.splice(i, 1, ...(this.layout.keys[i]).map(k => { k = { key: k }; if (row) k.row = row; return k; }));
         i += l - 1;
         row++;
       }
     }
-    layout.keys.forEach(key => {
+    this.layout.keys.forEach(key => {
       if (!key) key = {};
       const keyCode = keyCodeTable?.values?.find(l => l.key === key.key);
       if (!key.code && keyCode?.value) key.code = keyCode?.value;
@@ -100,9 +107,16 @@ export class OKeyboard {
             );
 
         if (!key.labels[i]) {
+          console.log("Generating label", i, key.key);
           key.labels[i] = [];
           if (labels[i].table?.values) {
-            labels[i].table.values.filter(l => keyCode? l.key === keyCode.key: l.key === key.key).forEach(l => [ l.value, ...l.altValues ].forEach(l => key.labels[i].push(tCaseFunc(l))));
+            let ll = labels[i].table.values.filter(l => keyCode? l.key === keyCode.key: l.key === key.key);
+            ll.forEach(l => {
+              let lll = [ l.value, ...(l.altValues || []) ];
+              lll.forEach(llll => key.labels[i].push(tCaseFunc(llll)))
+              //console.log(lll)
+            });
+            console.log(key.labels[i])
           }
           //if (i == mainLabel.position) key.labels[i] = [tCaseFunc(key.letter)];
           /*else if (labels[i].type === "letter") key.labels[i] = labels[i].table?.values?.filter(l => l.code === key.code && l.letter !== key.letter)?.map(l => tCaseFunc(l.letter));
@@ -114,34 +128,35 @@ export class OKeyboard {
             }
           }*/
         } else {
+          console.log("Processing label", i, key.key, key.labels[i]);
           if (!Array.isArray(key.labels[i])) key.labels[i] = [key.labels[i]];
         }
-        key.labels[i] = key.labels[i]?.map(t => {
-          return ((t && labels[i].table?.letters?.filter(l => (Array.isArray(t))? t.flat(2).includes(l.key): l.key === t)) || labels[i].table?.letters?.filter(l => (keyCode? l.key === keyCode.key: l.key === key.key) && l.letter !== key.letter))?.map(l => tCaseFunc(l.letter)).join("</tspan><tspan> </tspan><tspan>") || "";
+        //key.labels[i] = key.labels[i].map(t => {
+        //  return ((t && labels[i].table?.values?.filter(l => (Array.isArray(t))? t.flat(2).includes(l.key): l.key === t)) || labels[i].table?.values?.filter(l => (keyCode? l.key === keyCode.key: l.key === key.key) && l.value !== key.key))?.map(l => tCaseFunc(l.letter)).join("</tspan><tspan> </tspan><tspan>") || "";
           //else if (labels[i].type === "phoneticAlphabet") t = labels[i].phoneticData?.letters?.find(l => l.letter === (t || key.letter))?.name || t || "";
           //return t;
-        });
+        //});
       }
 
       if (typeof key.row !== "number") {
         let defRow = 0;
-        while (layout.keys.filter(k => typeof k.row === "number" && k.row === defRow).length >= (layout.rows[defRow]?.maxKeys || layout.maxRowKeys || 0xFFFF)) defRow++;
+        while (this.layout.keys.filter(k => typeof k.row === "number" && k.row === defRow).length >= (this.layout.rows[defRow]?.maxKeys || this.layout.maxRowKeys || 0xFFFF)) defRow++;
         key.row = defRow;
       }
-      if (!layout.rows[key.row]) layout.rows[key.row] = {};
-      if (!layout.rows[key.row].columns) layout.rows[key.row].columns = [];
+      if (!this.layout.rows[key.row]) this.layout.rows[key.row] = {};
+      if (!this.layout.rows[key.row].columns) this.layout.rows[key.row].columns = [];
 
       if (typeof key.column !== "number") {
         let defColumn = 0;
-        while (layout.keys.filter(k => typeof k.row === "number" && k.row === key.row && typeof k.column === "number" && k.column === defColumn).length >= (layout.rows[key.row].columns[defColumn]?.maxKeys || layout.maxColumnKeys || 0xFFFF)) defColumn++;
+        while (this.layout.keys.filter(k => typeof k.row === "number" && k.row === key.row && typeof k.column === "number" && k.column === defColumn).length >= (this.layout.rows[key.row].columns[defColumn]?.maxKeys || this.layout.maxColumnKeys || 0xFFFF)) defColumn++;
         key.column = defColumn;
       }
-      if (!layout.rows[key.row].columns[key.column]) layout.rows[key.row].columns[key.column] = {};
-      if (!layout.rows[key.row].columns[key.column].keys) layout.rows[key.row].columns[key.column].keys = [];
-      layout.rows[key.row].columns[key.column].keys.push(key);
+      if (!this.layout.rows[key.row].columns[key.column]) this.layout.rows[key.row].columns[key.column] = {};
+      if (!this.layout.rows[key.row].columns[key.column].keys) this.layout.rows[key.row].columns[key.column].keys = [];
+      this.layout.rows[key.row].columns[key.column].keys.push(key);
     });
 
-    layout.rows.forEach(row => {
+    this.layout.rows.forEach(row => {
       let rowSize = row.columns.reduce((s, c) => s + c.keys.length, 0);
       if (rowSize > longestRowSize) longestRowSize = rowSize;
       html += `<div class="keyrow">`;

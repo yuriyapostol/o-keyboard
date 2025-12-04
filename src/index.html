@@ -3,9 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
-  <title>Morse Trainer</title>
-  <!--link rel="icon" type="image/png" sizes="32x32" href="<%= config.baseUrl %>images/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="256x256" href="<%= config.baseUrl %>images/icon-256x256.png"-->
+  <title>Morse Keyboard Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -48,7 +46,7 @@
     }
   </style>
 
-  <link rel="stylesheet" href="keyboard.css">
+  <link rel="stylesheet" href="./index.css">
 </head>
 
 <body lang="en">
@@ -66,7 +64,7 @@
       maxColumnKeys: 12,
       onKeyDown: (key) => {
         const table = tables.find(t => t.id === keyboard.layout.labels.find(l => l.type === "letter" && !l.position).table);
-        const letter = table.letters.find(l => l.letter === key.letter);
+        const letter = table.values.find(l => l.letter === key.letter);
         console.log(letter)
         if (letter && letter.code) {
           playMorseCode(letter.code);
@@ -85,31 +83,31 @@
 
     const envelopeDuration = 0.005;
     
-    const curveInArray = new Float32Array(11);
-    curveInArray[0] = 0;
-    curveInArray[1] = 0.01462;
-    curveInArray[2] = 0.0645;
-    curveInArray[3] = 0.16003;
-    curveInArray[4] = 0.30886;
-    curveInArray[5] = 0.5;
-    curveInArray[6] = 0.69114;
-    curveInArray[7] = 0.83997;
-    curveInArray[8] = 0.9355;
-    curveInArray[9] = 0.98538;
-    curveInArray[10] = 1;
+    const curveIn = new Float32Array(11);
+    curveIn[0] = 0;
+    curveIn[1] = 0.01462;
+    curveIn[2] = 0.0645;
+    curveIn[3] = 0.16003;
+    curveIn[4] = 0.30886;
+    curveIn[5] = 0.5;
+    curveIn[6] = 0.69114;
+    curveIn[7] = 0.83997;
+    curveIn[8] = 0.9355;
+    curveIn[9] = 0.98538;
+    curveIn[10] = 1;
 
-    const curveOutArray = new Float32Array(11);
-    curveOutArray[0] = 1;
-    curveOutArray[1] = 0.98538;
-    curveOutArray[2] = 0.9355;
-    curveOutArray[3] = 0.83997;
-    curveOutArray[4] = 0.69114;
-    curveOutArray[5] = 0.5;
-    curveOutArray[6] = 0.30886;
-    curveOutArray[7] = 0.16003;
-    curveOutArray[8] = 0.0645;
-    curveOutArray[9] = 0.01462;
-    curveOutArray[10] = 0;
+    const curveOut = new Float32Array(11);
+    curveOut[0] = 1;
+    curveOut[1] = 0.98538;
+    curveOut[2] = 0.9355;
+    curveOut[3] = 0.83997;
+    curveOut[4] = 0.69114;
+    curveOut[5] = 0.5;
+    curveOut[6] = 0.30886;
+    curveOut[7] = 0.16003;
+    curveOut[8] = 0.0645;
+    curveOut[9] = 0.01462;
+    curveOut[10] = 0;
 
     let audioContext;
     let endTime;
@@ -157,10 +155,10 @@
       // Налаштовуємо огинаючу (плавне зростання і згасання звуку)
       gainNode.gain.setValueAtTime(0, endTime);  // Початковий рівень гучності 0
       //gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + envelopeDuration);  // Атака
-      gainNode.gain.setValueCurveAtTime(curveInArray, endTime, envelopeDuration);  // Атака
+      gainNode.gain.setValueCurveAtTime(curveIn, endTime, envelopeDuration);  // Атака
       gainNode.gain.setValueAtTime(1, endTime + duration - envelopeDuration);  // Підтримка
       //gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration / 1000);  // Згасання
-      gainNode.gain.setValueCurveAtTime(curveOutArray, endTime + duration - envelopeDuration, envelopeDuration);  // Згасання
+      gainNode.gain.setValueCurveAtTime(curveOut, endTime + duration - envelopeDuration, envelopeDuration);  // Згасання
 
       oscillator.start(endTime);
       oscillator.stop(endTime + duration);

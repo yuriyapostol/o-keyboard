@@ -4,7 +4,7 @@ export const layout = {
   labels: [
     { type: "letter", tableName: "en", case: "upper", keyCode: { type: "morse-code", tableName: "itu" } },
     { type: "letter", tableName: "uk", position: 2, size: 0.8, case: "upper", keyCode: { type: "morse-code", tableName: "uk-legal" } },
-    { type: "phonetic-alphabet", table: "nato", position: 7, size: 0.6, direction: "column" },
+    { type: "phonetic-alphabet", tableName: "nato", position: 7, size: 0.6, direction: "column" },
   ],
   keys: [
     { key: "1", row: 0 },
