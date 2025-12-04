@@ -1,5 +1,5 @@
 export const layout = {
-  id: "uk-en",
+  name: "uk-en",
   title: "Ukrainian QWERTY + English",
   labels: [
     { type: "letter", table: "uk" },

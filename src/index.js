@@ -8,8 +8,8 @@ export const layouts = [
   layoutUkEn.layout,
 ];
 
-import * as tableMorzeItu from './data/tables/morze/itu.js';
-import * as tableMorzeUkLegal from './data/tables/morze/uk-legal.js';
+import * as tableMorzeItu from './data/tables/morze-codes/itu.js';
+import * as tableMorzeUkLegal from './data/tables/morze-codes/uk-legal.js';
 import * as tablePhoneticNato from './data/tables/phonetic-alphabets/nato.js';
 import * as tablePhoneticUk from './data/tables/phonetic-alphabets/uk.js';
 

@@ -1,5 +1,5 @@
 export const table = {
-  id: "uk",
+  name: "uk",
   type: "phonetic-alphabet",
   language: "uk",
   title: "uk",

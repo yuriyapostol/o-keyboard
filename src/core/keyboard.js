@@ -55,64 +55,71 @@ export class OKeyboard {
       labels[i] = { ...(layout.labels?.[i] || {}) };
       labels[i].position = labelPositions[i];
       if (!labels[i].type) labels[i].type = "undefined";
-      if ((labels[i].type === "letter" || labels[i].type === "phonetic-alphabet") && labels[i].table) {
-        labels[i].tableData = this.tables.find(t => t.id === labels[i].table);
+      else if (labels[i].tableName) {
+        labels[i].table = this.tables.find(t => t.type == labels[i].type && t.name === labels[i].tableName);
       }
-      //if (labels[i].type === "phonetic-alphabet" && labels[i].table) {
-      //  labels[i].phoneticData = this.tables.find(t => t.type == labels[i].type && t.id === labels[i].name);
-      //}
+      if (labels[i].keyCode && labels[i].keyCode.type && labels[i].keyCode.tableName) {
+        labels[i].keyCode.table = this.tables.find(t => t.type == labels[i].keyCode.type && t.name === labels[i].keyCode.tableName);
+      }
       if (labels[i].size) {
         styles.push(`.key button svg .${labels[i].position ? 'key-alt-label-' + labels[i].position : 'key-label'} tspan { font-size: ${labels[i].size}em; }`);
       }
     }
 
-    const letterLabelIndex = labels.findIndex(l => l.type === "letter");
+    const mainLabel = labels.find(l => l.isMain) || labels.find(l => l.keyCode) || labels.find(l => l.type === "letter");
+    if (mainLabel) mainLabel.isMain = true;
+
+    const keyCodeTable = labels.find(l => l.keyCode)?.keyCode?.table;
+    
     if (!layout.rows) layout.rows = [];
 
     for (let i = 0, row = 0; i < layout.keys.length; i++) {
       if (typeof layout.keys[i] === "string") {
-        layout.keys[i] = { letter: layout.keys[i] };
+        layout.keys[i] = { key: layout.keys[i] };
         if (row) layout.keys[i].row = row;
       }
       else if (Array.isArray(layout.keys[i])) {
         const l = layout.keys[i].length;
-        layout.keys.splice(i, 1, ...(layout.keys[i]).map(k => { k = { letter: k }; if (row) k.row = row; return k; }));
+        layout.keys.splice(i, 1, ...(layout.keys[i]).map(k => { k = { key: k }; if (row) k.row = row; return k; }));
         i += l - 1;
         row++;
       }
     }
     layout.keys.forEach(key => {
       if (!key) key = {};
-      const keyLetter = labels[letterLabelIndex]?.tableData?.values?.find(l => l.key === key.letter);
-      if (!key.code) key.code = keyLetter?.code;
+      const keyCode = keyCodeTable?.values?.find(l => l.key === key.key);
+      if (!key.code && keyCode?.value) key.code = keyCode?.value;
       if (!key.labels) key.labels = [];
 
       for (let i = 0; i < labelsLength; i++) {
         const tCaseFunc = labels[i].case === "upper"
-          ? t => t.toUpperCase()
+          ? t => (t?.toUpperCase && t.toUpperCase()) || t
           : ( labels[i].case === "lower"
-            ? t => t.toLowerCase()
+            ? t => (t?.toLowerCase && t.toLowerCase()) || t
             : t => t
             );
 
         if (!key.labels[i]) {
           key.labels[i] = [];
-          if (i === letterLabelIndex) key.labels[i] = [tCaseFunc(key.letter)];
-          else if (labels[i].type === "letter") key.labels[i] = labels[i].tableData?.values?.filter(l => l.code === key.code && l.letter !== key.letter)?.map(l => tCaseFunc(l.letter));
+          if (labels[i].table?.values) {
+            labels[i].table.values.filter(l => keyCode? l.key === keyCode.key: l.key === key.key).forEach(l => [ l.value, ...l.altValues ].forEach(l => key.labels[i].push(tCaseFunc(l))));
+          }
+          //if (i == mainLabel.position) key.labels[i] = [tCaseFunc(key.letter)];
+          /*else if (labels[i].type === "letter") key.labels[i] = labels[i].table?.values?.filter(l => l.code === key.code && l.letter !== key.letter)?.map(l => tCaseFunc(l.letter));
           else if (labels[i].type === "phoneticAlphabet") {
             let f = labels[i].phoneticData?.letters?.find(l => l.letter === key.letter);
             if (f) {
               if (f.altNames) key.labels[i] = [ f.name, ...f.altNames ];
               else key.labels[i] = [ f.name ];
             }
-          }
+          }*/
         } else {
           if (!Array.isArray(key.labels[i])) key.labels[i] = [key.labels[i]];
         }
         key.labels[i] = key.labels[i]?.map(t => {
-          if (labels[i].type === "letter") t = ((t && labels[i].tableData?.letters?.filter(l => (Array.isArray(t))? t.flat(2).includes(l.letter): l.letter === t)) || labels[i].tableData?.letters?.filter(l => l.code === key.code && l.letter !== key.letter))?.map(l => tCaseFunc(l.letter)).join("</tspan><tspan> </tspan><tspan>") || "";
-          else if (labels[i].type === "phoneticAlphabet") t = labels[i].phoneticData?.letters?.find(l => l.letter === (t || key.letter))?.name || t || "";
-          return t;
+          return ((t && labels[i].table?.letters?.filter(l => (Array.isArray(t))? t.flat(2).includes(l.key): l.key === t)) || labels[i].table?.letters?.filter(l => (keyCode? l.key === keyCode.key: l.key === key.key) && l.letter !== key.letter))?.map(l => tCaseFunc(l.letter)).join("</tspan><tspan> </tspan><tspan>") || "";
+          //else if (labels[i].type === "phoneticAlphabet") t = labels[i].phoneticData?.letters?.find(l => l.letter === (t || key.letter))?.name || t || "";
+          //return t;
         });
       }
 
@@ -147,7 +154,7 @@ export class OKeyboard {
               key.labels[i]?.map((t, j) => `<tspan${labels[i].direction === "column"? ' x="0" dy="' + ((j? 1: 1 - key.labels[i].length) * 30 * 1.1 * labels[i].size).toFixed(1) + '"': (j? ' dx="' + (30 * 0.2 * labels[i].size).toFixed(1) + '"': '')}>${t}</tspan>`).join("") +
               `</text>`;
           }
-          html += `<div class="key${key.hilighted? ' key-hilighted': ''}${key.disabled? ' key-disabled': ''}" data-key="${key.letter}">` +
+          html += `<div class="key${key.hilighted? ' key-hilighted': ''}${key.disabled? ' key-disabled': ''}" data-key="${key.key}">` +
             `<button${key.disabled? ' disabled': ''}>` +
             `<svg viewBox="0 0 100 150"><rect class="key-shadow"/><rect class="key-face"/><g class="key-labels">${keyHTML}</g></svg>` +
             `</button></div>`;
@@ -212,7 +219,7 @@ export class OKeyboard {
     const key = this.layout.keys.find(k => k.letter === letter);
     if (!key || key.pressed || key.disabled) return;
     key.pressed = +(Date.now());
-    const element = this.container.querySelector(`.key[data-key="${key.letter}"]`);
+    const element = this.container.querySelector(`.key[data-key="${key.key}"]`);
     if (element) {
       element.classList.add("key-pressed");
       element.querySelector(`button`).focus();

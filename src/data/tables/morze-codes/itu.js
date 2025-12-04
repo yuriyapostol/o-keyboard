@@ -1,6 +1,6 @@
 export const table = {
-  id: "itu",
-  type: "morze",
+  name: "itu",
+  type: "morze-code",
   language: "en",
   title: "International (ITU)",
   values: [

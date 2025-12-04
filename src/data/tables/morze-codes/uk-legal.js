@@ -1,6 +1,6 @@
 export const table = {
   id: "uk-legal",
-  type: "morze",
+  type: "morze-code",
   language: "uk",
   title: "Ukrainian (legal)",
   values: [
