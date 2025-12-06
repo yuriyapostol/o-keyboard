@@ -76,7 +76,7 @@ export class OKeyboard {
     const mainLabel = labels.find(l => l.isMain) || labels.find(l => l.keyCode) || labels.find(l => l.type === "letter");
     if (mainLabel) mainLabel.isMain = true;
 
-    const keyCodeTable = labels.find(l => l.keyCode)?.keyCode?.table;
+    const keyCodeTable = labels.find(l => l.isMain && l.keyCode) || labels.find(l => !l.position && l.keyCode) || labels.find(l => l.keyCode)?.keyCode?.table;
     
     if (!this.layout.rows) this.layout.rows = [];
 
