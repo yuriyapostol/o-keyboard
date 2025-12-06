@@ -110,14 +110,10 @@ export class OKeyboard {
           console.log("Generating label", i, key.key);
           key.labels[i] = [];
           if (labels[i].table?.values) {
-            let ll = labels[i].table.values.filter(l => keyCode? l.key === keyCode.key: l.key === key.key);
-            ll.forEach(l => {
-              let lll = [ l.value, ...(l.altValues || []) ];
-              lll.forEach(llll => key.labels[i].push(tCaseFunc(llll)))
-              //console.log(lll)
-            });
-            console.log(key.labels[i])
+            labels[i].table.values.filter(l => keyCode? l.key === keyCode.key: l.key === key.key)
+              .forEach(l => [ l.value, ...(l.altValues || []) ].forEach(l => key.labels[i].push(tCaseFunc(l))));
           }
+            console.log(JSON.stringify(key.labels[i]))
           //if (i == mainLabel.position) key.labels[i] = [tCaseFunc(key.letter)];
           /*else if (labels[i].type === "letter") key.labels[i] = labels[i].table?.values?.filter(l => l.code === key.code && l.letter !== key.letter)?.map(l => tCaseFunc(l.letter));
           else if (labels[i].type === "phoneticAlphabet") {
