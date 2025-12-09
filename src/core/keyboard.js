@@ -191,11 +191,11 @@ export class OKeyboard {
     if (!this._rendered) return;
     this.container.querySelectorAll(".key").forEach(element => {
       const button = element.querySelector("button"),
-        letter = element.getAttribute("data-key"),
-        key = this.layout.keys.find(l => l.letter === letter);
+        keyName = element.getAttribute("data-key"),
+        key = this.layout.keys.find(l => l.key === keyName);
 
       const onMouseDown = (event) => {
-        if (key.disabled) return;
+        if (!key || key.disabled) return;
         key.pressed = +(Date.now());
         element.querySelector("button").focus();
         element.classList.add("key-pressed");
@@ -205,8 +205,8 @@ export class OKeyboard {
 
       const onMouseUp = (event) => {
         element.classList.remove("key-pressed");
-        key.pressed = false;
-        const i = this.keysPressed.findIndex(k => k.key.letter === key.letter);
+        if (key) key.pressed = false;
+        const i = this.keysPressed.findIndex(k => k.key.key === keyName);
         if (i >= 0) this.keysPressed.splice(i, 1);
         try { this.onKeyUp(key, event); } catch (e) { console.error(e); }
       };
@@ -230,8 +230,8 @@ export class OKeyboard {
   }
 
   _physicalKeyDown(event) {
-    const letter = (event.key || "").toLowerCase();
-    const key = this.layout.keys.find(k => k.letter === letter);
+    const keyName = (event.key || "").toLowerCase();
+    const key = this.layout.keys.find(k => k.key === keyName);
     if (!key || key.pressed || key.disabled) return;
     key.pressed = +(Date.now());
     const element = this.container.querySelector(`.key[data-key="${key.key}"]`);
@@ -245,14 +245,14 @@ export class OKeyboard {
   }
 
   _physicalKeyUp(event) {
-    const letter = (event.key || "").toLowerCase();
-    const key = this.layout.keys.find(k => k.letter === letter);
+    const keyName = (event.key || "").toLowerCase();
+    const key = this.layout.keys.find(k => k.key === keyName);
     if (!key) return;
-    const element = this.container.querySelector(`.key[data-key="${key.letter}"]`);
+    const element = this.container.querySelector(`.key[data-key="${key.key}"]`);
     if (element) element.classList.remove("key-pressed");
     key.pressed = false;
     try { this.onKeyUp(key, event); } catch (err) { console.error(err); }
-    const i = this.keysPressed.findIndex(k => k.key.letter === letter);
+    const i = this.keysPressed.findIndex(k => k.key.key === keyName);
     if (i >= 0) this.keysPressed.splice(i, 1);
   }
 
