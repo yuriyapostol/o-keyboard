@@ -76,7 +76,7 @@ export class OKeyboard {
     const mainLabel = labels.find(l => l.isMain) || labels.find(l => l.keyCode) || labels.find(l => l.type === "letter");
     if (mainLabel) mainLabel.isMain = true;
 
-    const keyCodeTable = labels.find(l => l.isMain && l.keyCode) || labels.find(l => !l.position && l.keyCode) || labels.find(l => l.keyCode)?.keyCode?.table;
+    const keyCodeTable = (labels.find(l => l.isMain && l.keyCode) || labels.find(l => !l.position && l.keyCode) || labels.find(l => l.keyCode))?.keyCode?.table;
     
     if (!this.layout.rows) this.layout.rows = [];
 
@@ -109,8 +109,8 @@ export class OKeyboard {
         if (!key.labels[i]) {
           console.log("Generating label", i, key.key);
           key.labels[i] = [];
+            console.log(`keyCode ${labels[i].keyCode?.type} - ${keyCodeTable?.type}`);
           if (labels[i].keyCode?.type === keyCodeTable?.type && labels[i].keyCode?.tableName !== keyCodeTable?.name) {
-            console.log(`keyCode ${labels[i].keyCode?.type}`)
             labels[i].keyCode.table.values.filter(l => l.value === keyCode?.value).forEach(l => key.labels[i].push(tCaseFunc(l.key)));
           }
           else if (labels[i].table?.values) {
