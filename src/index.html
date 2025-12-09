@@ -63,11 +63,11 @@
       maxRowKeys: 12,
       maxColumnKeys: 12,
       onKeyDown: (key) => {
-        const table = tables.find(t => t.id === keyboard.layout.labels.find(l => l.type === "letter" && !l.position).table);
-        const letter = table.values.find(l => l.letter === key.letter);
-        console.log(letter)
-        if (letter && letter.code) {
-          playMorseCode(letter.code);
+        //const table = tables.find(t => t.id === keyboard.layout.labels.find(l => l.type === "letter" && !l.position).table);
+        //const key = table.values.find(l => l.key === key.key);
+        console.log(key)
+        if (key && key.code) {
+          playMorseCode(key.code);
         }
       },
     });
