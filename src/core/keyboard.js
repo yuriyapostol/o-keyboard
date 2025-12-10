@@ -107,11 +107,14 @@ export class OKeyboard {
             );
 
         if (!key.labels[i]) {
-          console.log("Generating label", i, key.key);
+          console.log("------------- Generating label", i, key.key);
           key.labels[i] = [];
-            console.log(`keyCode ${labels[i].keyCode?.type} - ${keyCodeTable?.type}`);
+            //console.log(`keyCode ${labels[i].keyCode?.type} - ${keyCodeTable?.type}`);
           if (labels[i].keyCode?.type === keyCodeTable?.type && labels[i].keyCode?.tableName !== keyCodeTable?.name) {
-            labels[i].keyCode.table.values.filter(l => l.value === keyCode?.value).forEach(l => key.labels[i].push(tCaseFunc(l.key)));
+            console.log(keyCodeTable)
+            labels[i].keyCode.table.values.filter(l => l.value === keyCode?.value)
+              .map(l => labels[i].table.values.find(m => m.key === l.key && m.value !== keyCodeTable.values.find(n => n.key === l.key)?.value))
+              .forEach(l => l && key.labels[i].push(tCaseFunc(l.value)));
           }
           else if (labels[i].table?.values) {
             labels[i].table.values.filter(l => keyCode? l.key === keyCode.key: l.key === key.key)

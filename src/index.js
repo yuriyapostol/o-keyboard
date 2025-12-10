@@ -1,6 +1,6 @@
 export { OKeyboard } from "./core/keyboard.js";
 
-import * as layoutEnUk from './data/layouts/en-uk.js';
+/*import * as layoutEnUk from './data/layouts/en-uk.js';
 import * as layoutUkEn from './data/layouts/uk-en.js';
 
 export const layouts = [
@@ -22,9 +22,9 @@ export const tables = [
   tableMorseUkLegal.table,
   tablePhoneticNato.table,
   tablePhoneticUk.table,
-];
+];*/
 
 //export { layouts } from "./data/layouts.js";
 //export { tables } from "./data/tables.js";
 //export { phoneticAlphabets } from "./data/phoneticAlphabets.js";
-export { languages } from "./data/languages.js";
+//export { languages } from "./data/languages.js";

@@ -12,8 +12,8 @@
       "require": "./dist/index.cjs"
     },
     "./data/layouts": {
-      "import": "./dist/data/layouts.js",
-      "require": "./dist/data/layouts.cjs"
+      "import": "./dist/data/layouts/*.js",
+      "require": "./dist/data/layouts/*.cjs"
     },
     "./data/tables": {
       "import": "./dist/data/tables.js",
@@ -28,10 +28,11 @@
     "build:esm": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --metafile=dist/meta.json",
     "build:cjs": "esbuild src/index.js --bundle --format=cjs --outfile=dist/index.cjs",
     "build:data:esm": "esbuild src/data/layouts/*.js --bundle=false --format=esm --outdir=dist/data/layouts && esbuild src/data/tables/**/*.js --bundle=false --format=esm --outdir=dist/data/tables",
-    "build:data:cjs": "esbuild src/data/layouts/*.js --bundle=false --format=cjs --outdir=dist/data/layouts && esbuild src/data/tables/**/*.js --bundle=false --format=cjs --outdir=dist/data/tables",
+    "build:data:cjs": "esbuild src/data/layouts/*.js --bundle=false --format=cjs --outdir=dist/data/layouts --out-extension:.js=.cjs && esbuild src/data/tables/**/*.js --bundle=false --format=cjs --outdir=dist/data/tables --out-extension:.js=.cjs",
     "build": "npm run build:esm && npm run build:cjs && npm run build:data:esm && npm run build:data:cjs",
     "minify": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.min.js",
-    "dist": "npm run build && npm run minify && node ./scripts/copy-types.cjs && node ./scripts/copy-static.cjs"
+    "minify:data": "esbuild src/data/layouts/*.js --bundle=false --minify --format=esm --outdir=dist/data/layouts --out-extension:.js=.min.js && esbuild src/data/tables/**/*.js --bundle=false --minify --format=esm --outdir=dist/data/tables --out-extension:.js=.min.js",
+    "dist": "npm run build && npm run minify && npm run minify:data && node ./scripts/copy-types.cjs && node ./scripts/copy-static.cjs"
   },
   "repository": {
     "type": "git",
