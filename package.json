@@ -13,12 +13,12 @@
       "require": "./dist/index.cjs"
     },
     "./layouts/*": {
-      "types": "./types/layouts/*.d.ts",
+      "types": "./types/layouts.d.ts",
       "import": "./dist/data/layouts/*.js",
       "require": "./dist/data/layouts/*.cjs"
     },
     "./tables/*": {
-      "types": "./types/tables/**/*.d.ts",
+      "types": "./types/tables.d.ts",
       "import": "./dist/data/tables/**/*.js",
       "require": "./dist/data/tables/**/*.cjs"
     }
