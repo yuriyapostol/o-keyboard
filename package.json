@@ -8,16 +8,19 @@
   "module": "dist/index.js",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./data/layouts": {
+    "./layouts/*": {
+      "types": "./types/layouts/*.d.ts",
       "import": "./dist/data/layouts/*.js",
       "require": "./dist/data/layouts/*.cjs"
     },
-    "./data/tables": {
-      "import": "./dist/data/tables.js",
-      "require": "./dist/data/tables.cjs"
+    "./tables/*": {
+      "types": "./types/tables/**/*.d.ts",
+      "import": "./dist/data/tables/**/*.js",
+      "require": "./dist/data/tables/**/*.cjs"
     }
   },
   "files": [
@@ -25,14 +28,18 @@
     "types/"
   ],
   "scripts": {
+    "clean": "rm -rf dist && rm -rf types",
     "build:esm": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --metafile=dist/meta.json",
     "build:cjs": "esbuild src/index.js --bundle --format=cjs --outfile=dist/index.cjs",
     "build:data:esm": "esbuild src/data/layouts/*.js --bundle=false --format=esm --outdir=dist/data/layouts && esbuild src/data/tables/**/*.js --bundle=false --format=esm --outdir=dist/data/tables",
     "build:data:cjs": "esbuild src/data/layouts/*.js --bundle=false --format=cjs --outdir=dist/data/layouts --out-extension:.js=.cjs && esbuild src/data/tables/**/*.js --bundle=false --format=cjs --outdir=dist/data/tables --out-extension:.js=.cjs",
     "build": "npm run build:esm && npm run build:cjs && npm run build:data:esm && npm run build:data:cjs",
-    "minify": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.min.js",
-    "minify:data": "esbuild src/data/layouts/*.js --bundle=false --minify --format=esm --outdir=dist/data/layouts --out-extension:.js=.min.js && esbuild src/data/tables/**/*.js --bundle=false --minify --format=esm --outdir=dist/data/tables --out-extension:.js=.min.js",
-    "dist": "npm run build && npm run minify && npm run minify:data && node ./scripts/copy-types.cjs && node ./scripts/copy-static.cjs"
+    "minify:esm": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.min.js",
+    "minify:data:esm": "esbuild src/data/layouts/*.js --bundle=false --minify --format=esm --outdir=dist/data/layouts --out-extension:.js=.min.js && esbuild src/data/tables/**/*.js --bundle=false --minify --format=esm --outdir=dist/data/tables --out-extension:.js=.min.js",
+    "minify": "npm run minify:esm && npm run minify:data:esm",
+    "types": "tsc --emitDeclarationOnly --outDir types",
+    "copy-static": "cp src/index.css dist/ && cp src/index.html dist/",
+    "dist": "npm run clean && npm run build && npm run minify && npm run types && npm run copy-static"
   },
   "repository": {
     "type": "git",
@@ -57,6 +64,7 @@
   "author": "Yuriy Apostol",
   "license": "MIT",
   "devDependencies": {
-    "esbuild": "^0.27.0"
+    "esbuild": "^0.27.0",
+    "typescript": "^5.6.3"
   }
 }
