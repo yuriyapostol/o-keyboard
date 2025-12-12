@@ -1,30 +1,14 @@
-// ========== TABLE VALUE ==========
-
-export interface TableValue {
+export interface TableRecord {
   key: string;
   value?: string;
   altValues?: string[];
-  letter?: string;
-  code?: string | number;
 }
 
 
-
-// ========== FULL TABLE DEFINITION ==========
-
-export interface DataTable {
-  /** System name: "en", "itu", "uk-legal", ... */
+export interface Table {
   name: string;
-
-  /** Table type: "letter", "morse-code", "phonetic-alphabet", etc */
   type: string;
-
-  /** Human-readable title */
   title?: string;
-
-  /** Language code (optional, mostly for letter tables) */
   language?: string;
-
-  /** Actual payload */
-  values: TableValue[];
+  values: TableRecord[];
 }

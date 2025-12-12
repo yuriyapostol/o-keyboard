@@ -28,7 +28,7 @@
     "types/"
   ],
   "scripts": {
-    "clean": "rm -rf dist && rm -rf types",
+    "clean": "rm -rf dist",
     "build:esm": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --metafile=dist/meta.json",
     "build:cjs": "esbuild src/index.js --bundle --format=cjs --outfile=dist/index.cjs",
     "build:data:esm": "esbuild src/data/layouts/*.js --bundle=false --format=esm --outdir=dist/data/layouts && esbuild src/data/tables/**/*.js --bundle=false --format=esm --outdir=dist/data/tables",
@@ -37,9 +37,8 @@
     "minify:esm": "esbuild src/index.js --bundle --minify --format=esm --outfile=dist/index.min.js",
     "minify:data:esm": "esbuild src/data/layouts/*.js --bundle=false --minify --format=esm --outdir=dist/data/layouts --out-extension:.js=.min.js && esbuild src/data/tables/**/*.js --bundle=false --minify --format=esm --outdir=dist/data/tables --out-extension:.js=.min.js",
     "minify": "npm run minify:esm && npm run minify:data:esm",
-    "types": "tsc --emitDeclarationOnly --outDir types",
     "copy-static": "cp src/index.css dist/ && cp src/index.html dist/",
-    "dist": "npm run clean && npm run build && npm run minify && npm run types && npm run copy-static"
+    "dist": "npm run clean && npm run build && npm run minify && npm run copy-static"
   },
   "repository": {
     "type": "git",

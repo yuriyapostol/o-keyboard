@@ -1,42 +1,32 @@
-import type { KeyboardLayout, LayoutKey } from "./layouts.d.ts";
-import type { DataTable } from "./tables.d.ts";
+import type { Layout, Key } from "./layouts.d.ts";
+import type { Table } from "./tables.d.ts";
 
-
-
-// ========== KEYBOARD OPTIONS ==========
 
 export interface OKeyboardOptions {
   container: HTMLElement | string;
-
-  /** Layout to render */
-  layout: KeyboardLayout;
-
-  /** Tables: letters, morse, phonetic, etc */
-  tables: DataTable[];
+  layout: Layout;
+  tables: Table[];
 
   /** DOM or physical key pressed */
-  onKeyDown?: (key: LayoutKey, event: Event) => void;
-  onKeyUp?: (key: LayoutKey, event: Event) => void;
+  onKeyDown?: (key: Key, event: Event) => void;
+  onKeyUp?: (key: Key, event: Event) => void;
 
   /**
    * Raw keyboard event:
    *   - event.key triggers this directly
    *   - used for real-keyboard typing
    */
-  onPress?: (key: LayoutKey, event: Event) => void;
+  onPress?: (key: Key, event: Event) => void;
 }
 
 
-
-// ========== INSTANCE SHAPE ==========
-
 export interface OKeyboardInstance {
   container: HTMLElement;
-  layout: KeyboardLayout;
-  tables: DataTable[];
+  layout: Layout;
+  tables: Table[];
 
   keysPressed: {
-    key: LayoutKey;
+    key: Key;
     element: HTMLElement | null;
     event: Event;
   }[];
@@ -47,17 +37,15 @@ export interface OKeyboardInstance {
 }
 
 
-
-// ========== CLASS DECLARATION (no implementation) ==========
-
 export declare class OKeyboard implements OKeyboardInstance {
   constructor(options: OKeyboardOptions);
 
   container: HTMLElement;
-  layout: KeyboardLayout;
-  tables: DataTable[];
+  layout: Layout;
+  tables: Table[];
+  
   keysPressed: {
-    key: LayoutKey;
+    key: Key;
     element: HTMLElement | null;
     event: Event;
   }[];
