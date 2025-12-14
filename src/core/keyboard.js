@@ -1,14 +1,24 @@
+/**
+ * OKeyboard - On-screen keyboard component
+ * @module OKeyboard
+ * @author Yuriy Apostol <yuriyapostol@gmail.com>
+ * @license MIT
+ */
 export class OKeyboard {
   /**
-   * options:
-   *  - container: DOM element where keyboard will be rendered (required)
-   *  - layout: layout object (required)
-   *  - tables: tables array (required for letter lookups)
-   *  - onKeyDown: function(key) called on mouse down or physical key down
-   *  - onKeyUp: function(key) called on mouse up or physical key up
-   *  - onPress: function(key) called when a physical keyboard key is pressed
+   * Create a keyboard
+   * @param {Object} options - Configuration options
+   * @param {HTMLElement|string} options.container - Container element or selector
+   * @param {Object} options.layout - Keyboard layout definition
+   * @param {Array<Object>} [options.tables] - Optional data tables for layout
+   * @param {Function} [options.onKeyDown] - Callback for key down events
+   * @param {Function} [options.onKeyUp] - Callback for key up events
+   * @param {Function} [options.onPress] - Callback for key press events
+   * @throws {Error} If required options are missing or invalid
+   * @returns {OKeyboard} The created OKeyboard instance
    */
-  constructor(options = {}) {
+  constructor(options) {
+    if (!options) throw new Error("OKeyboard: options are required");
     if (!options.container) throw new Error("OKeyboard: container is required");
     this.container = (typeof options.container === 'string') ? document.querySelector(options.container) : options.container;
     if (!this.container || !(this.container instanceof HTMLElement)) {
@@ -31,7 +41,7 @@ export class OKeyboard {
       blur: this._windowBlur.bind(this)
     };
 
-    this.keysPressed = [];
+    this._keysPressed = [];
     this._rendered = false;
 
     this.render();
@@ -39,7 +49,10 @@ export class OKeyboard {
     this.attachPhysicalEvents();
   }
 
-  // ----- render and helpers -----
+  /**
+   * Render the keyboard layout
+   * @returns {void}
+   */
   render() {
     this.tables.forEach(t => {
       if (!t.values) t.values = [];
@@ -189,7 +202,10 @@ export class OKeyboard {
     this._rendered = true;
   }
 
-  // ----- DOM events for on-screen keys -----
+  /**
+   * Attach DOM event handlers to keys
+   * @returns {void}
+   */
   attachDomEvents() {
     if (!this._rendered) return;
     this.container.querySelectorAll(".key").forEach(element => {
@@ -202,15 +218,15 @@ export class OKeyboard {
         key.pressed = +(Date.now());
         element.querySelector("button").focus();
         element.classList.add("key-pressed");
-        this.keysPressed.push({ key, element, event });
+        this._keysPressed.push({ key, element, event });
         try { this.onKeyDown(key, event); } catch (e) { console.error(e); }
       };
 
       const onMouseUp = (event) => {
         element.classList.remove("key-pressed");
         if (key) key.pressed = false;
-        const i = this.keysPressed.findIndex(k => k.key.key === keyName);
-        if (i >= 0) this.keysPressed.splice(i, 1);
+        const i = this._keysPressed.findIndex(k => k.key.key === keyName);
+        if (i >= 0) this._keysPressed.splice(i, 1);
         try { this.onKeyUp(key, event); } catch (e) { console.error(e); }
       };
 
@@ -224,7 +240,10 @@ export class OKeyboard {
     });
   }
 
-  // ----- physical keyboard events -----
+  /**
+   * Attach physical keyboard event handlers
+   * @returns {void}
+   */
   attachPhysicalEvents() {
     document.addEventListener("keydown", this._bound.physicalKeyDown);
     document.addEventListener("keyup", this._bound.physicalKeyUp);
@@ -242,7 +261,7 @@ export class OKeyboard {
       element.classList.add("key-pressed");
       element.querySelector(`button`).focus();
     }
-    this.keysPressed.push({ key, element, event });
+    this._keysPressed.push({ key, element, event });
     try { this.onPress(key, event); } catch (err) { console.error(err); }
     try { this.onKeyDown(key, event); } catch (err) { console.error(err); }
   }
@@ -255,44 +274,27 @@ export class OKeyboard {
     if (element) element.classList.remove("key-pressed");
     key.pressed = false;
     try { this.onKeyUp(key, event); } catch (err) { console.error(err); }
-    const i = this.keysPressed.findIndex(k => k.key.key === keyName);
-    if (i >= 0) this.keysPressed.splice(i, 1);
+    const i = this._keysPressed.findIndex(k => k.key.key === keyName);
+    if (i >= 0) this._keysPressed.splice(i, 1);
   }
 
   _documentMouseUp() {
-    this.keysPressed.forEach(k => {
+    this._keysPressed.forEach(k => {
       if (k.element) k.element.classList.remove("key-pressed");
       k.key.pressed = false;
     });
-    this.keysPressed = [];
+    this._keysPressed = [];
   }
 
   _windowBlur() {
     this._documentMouseUp();
   }
 
-  // ----- external control API -----
-  highlightKey(letter, highligh = true) {
-    const element = this.container.querySelector(`.key[data-key="${letter}"]`);
-    if (!element) return;
-    const key = this.layout.keys.find(k => k.letter === letter);
-    if (!key) return;
-    key.disabled = !enable;
-    if (highligh) element.classList.add("key-hilighted");
-    else element.classList.remove("key-hilighted");
-  }
-
-  enableKey(letter, enable = true) {
-    const element = this.container.querySelector(`.key[data-key="${letter}"]`);
-    if (!element) return;
-    const key = this.layout.keys.find(k => k.letter === letter);
-    if (!key) return;
-    key.disabled = !enable;
-    if (enable) element.classList.remove("key-disabled"), element.querySelector("button").removeAttribute("disabled");
-    else element.classList.add("key-disabled"), element.querySelector("button").setAttribute("disabled", "disabled");
-  }
-
-  destroy() {
+  /**
+   * Destroy the keyboard instance and detach all event handlers
+   * @returns {void}
+   */
+  destroy() { 
     // detach DOM handlers
     this.container.querySelectorAll(".key").forEach(element => {
       const button = element.querySelector("button");
@@ -312,6 +314,6 @@ export class OKeyboard {
     // clear container
     this.container.innerHTML = "";
     this._rendered = false;
-    this.keysPressed = [];
+    this._keysPressed = [];
   }
 }
