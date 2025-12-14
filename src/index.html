@@ -58,30 +58,13 @@
 
     import { layout } from "./data/layouts/en-uk.js";
 
-    import * as lettersEn from './data/tables/letters/en.js';
-    import * as lettersUk from './data/tables/letters/uk.js';
-    import * as morseItu from './data/tables/morse-codes/itu.js';
-    import * as morseUkLegal from './data/tables/morse-codes/uk-legal.js';
-    import * as phoneticNato from './data/tables/phonetic-alphabets/nato.js';
-    import * as phoneticUk from './data/tables/phonetic-alphabets/uk.js';
-
-    const tables = [
-      lettersEn.table,
-      lettersUk.table,
-      morseItu.table,
-      morseUkLegal.table,
-      phoneticNato.table,
-      phoneticUk.table,
-    ]
-
     let keyboard = new OKeyboard({
       container: '.keyboard',
       layout,
-      tables,
       maxRowKeys: 12,
       maxColumnKeys: 12,
       onKeyDown: (key) => {
-        const code = key && keyboard.tables.find(t => t.type === "morse-code" && t.name === "itu")?.values.find(k => k.key === key.key)?.value;
+        const code = key && keyboard.layout.tables.find(t => t.type === "morse-code" && t.name === "itu")?.values.find(k => k.key === key.key)?.value;
         if (code) {
           playMorseCode(code);
         }

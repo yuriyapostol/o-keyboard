@@ -10,7 +10,6 @@ export class OKeyboard {
    * @param {Object} options - Configuration options
    * @param {HTMLElement|string} options.container - Container element or selector
    * @param {Object} options.layout - Keyboard layout definition
-   * @param {Array<Object>} [options.tables] - Optional data tables for layout
    * @param {Function} [options.onKeyDown] - Callback for key down events
    * @param {Function} [options.onKeyUp] - Callback for key up events
    * @param {Function} [options.onPress] - Callback for key press events
@@ -27,8 +26,6 @@ export class OKeyboard {
     
     if (!options.layout) throw new Error("OKeyboard: layout is required");
     this.layout = JSON.parse(JSON.stringify(options.layout));
-    
-    this.tables = options.tables? JSON.parse(JSON.stringify(options.tables)): [];
 
     this.onKeyDown = options.onKeyDown || (() => {});
     this.onKeyUp = options.onKeyUp || (() => {});
@@ -54,7 +51,7 @@ export class OKeyboard {
    * @returns {void}
    */
   render() {
-    this.tables.forEach(t => {
+    this.layout.tables.forEach(t => {
       if (!t.values) t.values = [];
       t.values.forEach(v => {
         if (typeof v === "string") v = { key: v };
@@ -76,10 +73,10 @@ export class OKeyboard {
       labels[i].position = labelPositions[i];
       if (!labels[i].type) labels[i].type = "undefined";
       else if (labels[i].tableName) {
-        labels[i].table = this.tables.find(t => t.type === labels[i].type && t.name === labels[i].tableName);
+        labels[i].table = this.layout.tables.find(t => t.type === labels[i].type && t.name === labels[i].tableName);
       }
       if (labels[i].keyCode && labels[i].keyCode.type && labels[i].keyCode.tableName) {
-        labels[i].keyCode.table = this.tables.find(t => t.type === labels[i].keyCode.type && t.name === labels[i].keyCode.tableName);
+        labels[i].keyCode.table = this.layout.tables.find(t => t.type === labels[i].keyCode.type && t.name === labels[i].keyCode.tableName);
       }
       if (labels[i].size) {
         styles.push(`.key button svg .${labels[i].position ? 'key-alt-label-' + labels[i].position : 'key-label'} tspan { font-size: ${labels[i].size}em; }`);
