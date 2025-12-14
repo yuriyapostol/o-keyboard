@@ -45,6 +45,7 @@ export interface Layout {
   title?: string;
   labels: KeyLabel[];
   keys: (Key | string | (string | null)[] )[];
+  tables: Table[];
   
   maxRowKeys?: number;
   maxColumnKeys?: number;
