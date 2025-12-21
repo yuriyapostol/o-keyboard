@@ -1,6 +1,6 @@
 export const layout = {
   name: "uk-en",
-  title: "Ukrainian QWERTY + English",
+  title: "Morse Code + Phonetic Alphabet: Ukrainian + English, QWERTY",
   labels: [
     { type: "letter", table: "uk" },
     { type: "letter", table: "itu", position: 2, size: 1 },

@@ -7,7 +7,7 @@ import * as phoneticUk from '../tables/phonetic-alphabets/uk.js';
 
 export const layout = {
   name: "en-uk",
-  title: "English QWERTY + Ukrainian",
+  title: "Morse Code + Phonetic Alphabet: English + Ukrainian, QWERTY",
   labels: [
     { type: "letter", tableName: "en", case: "upper", keyCode: { type: "morse-code", tableName: "itu" } },
     { type: "letter", tableName: "uk", position: 2, size: 0.8, case: "upper", keyCode: { type: "morse-code", tableName: "uk-legal" } },
