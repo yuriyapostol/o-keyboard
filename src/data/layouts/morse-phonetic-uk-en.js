@@ -1,10 +1,17 @@
+import * as lettersEn from '../tables/letters/en.js';
+import * as lettersUk from '../tables/letters/uk.js';
+import * as morseItu from '../tables/morse-codes/itu.js';
+import * as morseUkLegal from '../tables/morse-codes/uk-legal.js';
+import * as phoneticNato from '../tables/phonetic-alphabets/nato.js';
+import * as phoneticUk from '../tables/phonetic-alphabets/uk.js';
+
 export const layout = {
   name: "uk-en",
   title: "Morse Code + Phonetic Alphabet: Ukrainian + English, QWERTY",
   labels: [
-    { type: "letter", table: "uk" },
-    { type: "letter", table: "itu", position: 2, size: 1 },
-    { type: "phonetic-alphabet", name: "uk", position: 7, size: 0.6 },
+    { type: "letter", tableName: "uk", case: "upper", keyCode: { type: "morse-code", tableName: "uk-legal" } },
+    { type: "letter", tableName: "en", position: 2, size: 0.8, case: "upper", keyCode: { type: "morse-code", tableName: "itu" } },
+    { type: "phonetic-alphabet", tableName: "uk", position: 7, size: 0.6 },
   ],
   keys: [
     ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
@@ -13,4 +20,12 @@ export const layout = {
     ["я", "ч", "с", "м", "и", "т", "ь", "б", "ю"],
   ],
   hilightedKeys: ["а", "ф", "с", "т"],
+  tables: [
+    lettersEn.table,
+    lettersUk.table,
+    morseItu.table,
+    morseUkLegal.table,
+    phoneticNato.table,
+    phoneticUk.table
+  ]
 };

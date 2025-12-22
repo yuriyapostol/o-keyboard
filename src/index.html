@@ -55,14 +55,11 @@
   <script type="module">
 
     import { OKeyboard } from "./index.js";
-
-    import { layout } from "./data/layouts/en-uk.js";
+    import { layout } from "./data/layouts/morse-phonetic-en-uk.js";
 
     let keyboard = new OKeyboard({
       container: '.keyboard',
       layout,
-      maxRowKeys: 12,
-      maxColumnKeys: 12,
       onKeyDown: (key) => {
         const code = key && keyboard.layout.tables.find(t => t.type === "morse-code" && t.name === "itu")?.values.find(k => k.key === key.key)?.value;
         if (code) {
