@@ -4,6 +4,9 @@
  * @author Yuriy Apostol <yuriyapostol@gmail.com>
  * @license MIT
  */
+
+import { OKeyboardLayout } from "./layout.js";
+
 export class OKeyboard {
   /**
    * Create a keyboard
@@ -24,8 +27,10 @@ export class OKeyboard {
       throw new Error("OKeyboard: container is not a valid DOM element");
     }
     
-    if (!options.layout) throw new Error("OKeyboard: layout is required");
-    this.layout = JSON.parse(JSON.stringify(options.layout));
+    this.layouts = [];
+    if (options.layout) this.layout(options.layout);
+    //if (!options.layout) throw new Error("OKeyboard: layout is required");
+    //this.layout = JSON.parse(JSON.stringify(options.layout));
 
     this.onKeyDown = options.onKeyDown || (() => {});
     this.onKeyUp = options.onKeyUp || (() => {});
@@ -45,6 +50,38 @@ export class OKeyboard {
     this.attachDomEvents();
     this.attachPhysicalEvents();
   }
+
+  /**
+   * Get or set keyboard layout
+   * @param {string|Object} layout
+   * @returns {OKeyboardLayout|undefined}
+   */
+  layout(layout) {
+    if (typeof layout === "string") {
+      return this.layouts.find(l => l.name === layout);
+    }
+
+    if (typeof layout === "object") {
+      if (!layout.name) {
+        throw new Error("OKeyboard.layout(): layout.name is required");
+      }
+
+      let existing = this.layouts.find(l => l.name === layout.name);
+
+      if (existing) {
+        existing.set(layout);
+      }
+      else {
+        existing = new OKeyboardLayout(layout);
+        this.layouts.push(existing);
+      }
+
+      this.layout = existing;
+      //this.render();
+      return existing;
+    }
+  }
+
 
   /**
    * Render the keyboard layout
@@ -104,7 +141,7 @@ export class OKeyboard {
     }
     this.layout.keys.forEach(key => {
       if (!key) key = {};
-      const keyCode = keyCodeTable?.values?.find(l => l.key === key.key);
+      const keyCode = keyCodeTable?.values?.find(l => typeof key.key === "string"? l.key === key.key: Array.isArray(key.key)? key.key.flat(2).includes(l.key): false);
       if (!key.code && keyCode?.value) key.code = keyCode?.value;
       if (!key.labels) key.labels = [];
 
