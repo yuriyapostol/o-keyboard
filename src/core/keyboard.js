@@ -6,6 +6,7 @@
  */
 
 import { OKeyboardLayout } from "./layout.js";
+import { OKeyboardTable } from "./table.js";
 
 export class OKeyboard {
   /**
@@ -27,10 +28,13 @@ export class OKeyboard {
       throw new Error("OKeyboard: container is not a valid DOM element");
     }
     
+    this.tables = [];
+    if (options.tables) options.tables.forEach(t => this.table(t));
+    if (options.table) this.table(options.table);
+
     this.layouts = [];
+    if (options.layouts) options.layouts.forEach(l => this.layout(l));
     if (options.layout) this.layout(options.layout);
-    //if (!options.layout) throw new Error("OKeyboard: layout is required");
-    //this.layout = JSON.parse(JSON.stringify(options.layout));
 
     this.onKeyDown = options.onKeyDown || (() => {});
     this.onKeyUp = options.onKeyUp || (() => {});
@@ -82,6 +86,35 @@ export class OKeyboard {
     }
   }
 
+  /**
+   * Get or set table globally
+   * @param {string|Object} table
+   */
+  table(table) {
+    if (typeof table === "string") {
+      const { type, name } = OKeyboardTable.parseName(table);
+      return this.tables.find(t => (!type || t.type === type) && t.name === name);
+    }
+
+    if (typeof table === "object") {
+      const { type = table.type, name } = OKeyboardTable.parseName(table.name);
+
+      if (!type || !name) {
+        throw new Error("OKeyboard.table(): table.type and table.name are required");
+      }
+
+      let existing = this.tables.find(t => t.type === type && t.name === name);
+
+      if (existing) {
+        existing.set({ ...table, type, name });
+        return existing;
+      }
+
+      const created = new OKeyboardTable({ ...table, type, name });
+      this.tables.push(created);
+      return created;
+    }
+  }
 
   /**
    * Render the keyboard layout

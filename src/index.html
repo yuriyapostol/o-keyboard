@@ -61,7 +61,7 @@
       container: '.keyboard',
       layout,
       onKeyDown: (key) => {
-        const code = key && keyboard.layout.tables.find(t => t.type === "morse-code" && t.name === "itu")?.values.find(k => k.key === key.key)?.value;
+        const code = key && keyboard.layout.table({type: "morse-code", name: "itu"})?.value(key.key);
         if (code) {
           playMorseCode(code);
         }
