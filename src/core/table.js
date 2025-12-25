@@ -23,6 +23,7 @@ export class OKeyboardTable {
    * Get or set value in this table
    * @param {string} key
    * @param {string} [value]
+   * @return {any}
    */
   value(key, value) {
     let entry = this.values.find(v => v.key === key);
@@ -37,8 +38,30 @@ export class OKeyboardTable {
   }
 
   /**
+   * Get or set data entry in this table
+   * @param {string | Object | (string | Object)[]} data
+   * @return {Object | Object[] | null}
+   */
+  data(data) {
+    if (typeof data === "string") return this.values.find(v => v.key === data);
+    else if (Array.isArray(data)) return data.map(d => this.data(d));
+    else if (typeof data === "object" && typeof data.key === "string") {
+      let entry = this.values.find(v => v.key === data.key);
+      if (!entry) {
+        entry = { key: data.key };
+        this.values.push(entry);
+      }
+      Object.assign(entry, data);
+      return entry;
+    }
+    return null;
+  }
+
+
+  /**
    * Parse table full name into name and type
    * @param {string} fullName
+   * @return {Object} {type, name}
    */
   static parseName(fullName) {
     if (typeof fullName !== "string") return {};
