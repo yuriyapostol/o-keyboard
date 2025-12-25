@@ -15,11 +15,9 @@ export class OKeyboardLayout {
    * @param {Object} props
    */
   set(props = {}) {
-    const { tables = [], ...rest } = props;
+    const { tables, ...rest } = JSON.parse(JSON.stringify(props));
 
-    if (Object.keys(rest).length) {
-      Object.assign(this, JSON.parse(JSON.stringify(rest)));
-    }
+    if (Object.keys(rest).length) Object.assign(this, rest);
 
     if (props.tables) {
       this.tables = [];
@@ -31,7 +29,8 @@ export class OKeyboardLayout {
 
   /**
    * Get or set table in this layout
-   * @param {string|Object} table
+   * @param {string | Object} table
+   * @return {OKeyboardTable}
    */
   table(table) {
     if (typeof table === "string") {

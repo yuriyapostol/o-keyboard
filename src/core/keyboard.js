@@ -12,7 +12,7 @@ export class OKeyboard {
   /**
    * Create a keyboard
    * @param {Object} options - Configuration options
-   * @param {HTMLElement|string} options.container - Container element or selector
+   * @param {HTMLElement | string} options.container - Container element or selector
    * @param {Object} options.layout - Keyboard layout definition
    * @param {Function} [options.onKeyDown] - Callback for key down events
    * @param {Function} [options.onKeyUp] - Callback for key up events
@@ -27,10 +27,6 @@ export class OKeyboard {
     if (!this.container || !(this.container instanceof HTMLElement)) {
       throw new Error("OKeyboard: container is not a valid DOM element");
     }
-    
-    this.tables = [];
-    if (options.tables) options.tables.forEach(t => this.table(t));
-    if (options.table) this.table(options.table);
 
     this.layouts = [];
     if (options.layouts) options.layouts.forEach(l => this.layout(l));
@@ -57,8 +53,8 @@ export class OKeyboard {
 
   /**
    * Get or set keyboard layout
-   * @param {string|Object} layout
-   * @returns {OKeyboardLayout|undefined}
+   * @param {strin | Object} layout
+   * @returns {OKeyboardLayout | undefined}
    */
   layout(layout) {
     if (typeof layout === "string") {
@@ -87,48 +83,10 @@ export class OKeyboard {
   }
 
   /**
-   * Get or set table globally
-   * @param {string|Object} table
-   */
-  table(table) {
-    if (typeof table === "string") {
-      const { type, name } = OKeyboardTable.parseName(table);
-      return this.tables.find(t => (!type || t.type === type) && t.name === name);
-    }
-
-    if (typeof table === "object") {
-      const { type = table.type, name } = OKeyboardTable.parseName(table.name);
-
-      if (!type || !name) {
-        throw new Error("OKeyboard.table(): table.type and table.name are required");
-      }
-
-      let existing = this.tables.find(t => t.type === type && t.name === name);
-
-      if (existing) {
-        existing.set({ ...table, type, name });
-        return existing;
-      }
-
-      const created = new OKeyboardTable({ ...table, type, name });
-      this.tables.push(created);
-      return created;
-    }
-  }
-
-  /**
    * Render the keyboard layout
    * @returns {void}
    */
   render() {
-    this.layout.tables.forEach(t => {
-      if (!t.values) t.values = [];
-      t.values.forEach(v => {
-        if (typeof v === "string") v = { key: v };
-        if (typeof v.value === "undefined") v.value = v.key;
-      });
-    });
-
     const labelsLength = this.layout.labels?.length || 9;
     const labelPositions = this.layout.labels?.map(l => parseInt(l?.position) || 0) || [];
     const labels = [];

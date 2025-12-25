@@ -6,6 +6,8 @@ export class OKeyboardTable {
     if (!props.type) {
       throw new Error("OKeyboardTable: table.type is required");
     }
+
+    this.values = [];
     this.set(props);
   }
 
@@ -14,8 +16,17 @@ export class OKeyboardTable {
    * @param {Object} props
    */
   set(props = {}) {
-    //Object.keys(this).forEach(k => delete this[k]);
-    Object.assign(this, JSON.parse(JSON.stringify(props)));
+    let { values, ...rest } = JSON.parse(JSON.stringify(props));
+
+    if (Object.keys(rest).length) Object.assign(this, rest);
+    if (values) {
+      this.values = [];
+      values.forEach(d => {
+        if (typeof d === "string") d = { key: d };
+        if (typeof d.value === "undefined") d.value = d.key;
+        this.values.push(d);
+      });
+    }
     return this;
   }
 
