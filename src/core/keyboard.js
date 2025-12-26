@@ -121,8 +121,8 @@ export class OKeyboard {
     }
     this.layout.keys.forEach(key => {
       if (!key) key = {};
-      const keyCode = codeTable?.values?.find(l => typeof key.key === "string"? l.key === key.key: Array.isArray(key.key)? key.key.flat(2).includes(l.key): false);
-      if (!key.code && keyCode?.value) key.code = keyCode?.value;
+      const keyCodes = codeTable?.values?.filter(l => typeof key.key === "string"? l.key === key.key: (Array.isArray(key.key)? key.key.flat(2).includes(l.key): false));
+      if (!key.code && keyCodes?.[0]?.value) key.code = keyCodes[0].value;
       if (!key.labels) key.labels = [];
 
       for (let i = 0; i < labels.length; i++) {
@@ -138,12 +138,12 @@ export class OKeyboard {
           key.labels[i] = [];
             //console.log(`keyCode ${labels[i].keyCode?.type} - ${keyCodeTable?.type}`);
           if (labels[i].codeTable?.type === codeTable?.type && labels[i].codeTable?.name !== codeTable?.name) {
-            this.layout.table(labels[i].codeTable).values.filter(l => l.value === keyCode?.value)
+            this.layout.table(labels[i].codeTable).values.filter(l => keyCodes?.some(k => k.value === l.value))
               .map(l => this.layout.table(labels[i].valueTable)?.values.find(m => m.key === l.key && m.value !== codeTable.values.find(n => n.key === l.key)?.value))
               .forEach(l => l && key.labels[i].push(tCaseFunc(l.value)));
           }
           else if (labels[i].valueTable) {
-            this.layout.table(labels[i].valueTable)?.values.filter(l => keyCode? l.key === keyCode.key: l.key === key.key)
+            this.layout.table(labels[i].valueTable)?.values.filter(l => keyCodes?.length? keyCodes.some(k => k.key === l.key): l.key === key.key)
               .forEach(l => [ l.value, ...(l.altValues || []) ].forEach(l => key.labels[i].push(tCaseFunc(l))));
           }
             console.log(JSON.stringify(key.labels[i]))
@@ -224,7 +224,7 @@ export class OKeyboard {
     this.container.querySelectorAll(".key").forEach(element => {
       const button = element.querySelector("button"),
         keyName = element.getAttribute("data-key"),
-        key = this.layout.keys.find(l => l.key === keyName);
+        key = this.layout.keys.find(l => ((Array.isArray(l.key) && l.key.flat(2).join(",")) || l.key) === keyName);
 
       const onMouseDown = (event) => {
         if (!key || key.disabled) return;
@@ -266,7 +266,8 @@ export class OKeyboard {
 
   _physicalKeyDown(event) {
     const keyName = (event.key || "").toLowerCase();
-    const key = this.layout.keys.find(k => k.key === keyName);
+    const key = this.layout.keys.find(k => Array.isArray(k.key)? k.key.flat(2).includes(keyName): k.key === keyName);
+    console.log("Physical key down:", keyName, key);
     if (!key || key.pressed || key.disabled) return;
     key.pressed = +(Date.now());
     const element = this.container.querySelector(`.key[data-key="${key.key}"]`);
@@ -281,7 +282,7 @@ export class OKeyboard {
 
   _physicalKeyUp(event) {
     const keyName = (event.key || "").toLowerCase();
-    const key = this.layout.keys.find(k => k.key === keyName);
+    const key = this.layout.keys.find(k => Array.isArray(k.key)? k.key.flat(2).includes(keyName): k.key === keyName);
     if (!key) return;
     const element = this.container.querySelector(`.key[data-key="${key.key}"]`);
     if (element) element.classList.remove("key-pressed");

@@ -55,13 +55,14 @@
   <script type="module">
 
     import { OKeyboard } from "./index.js";
-    import { layout } from "./data/layouts/morse-phonetic-en-uk.js";
+    import { layout } from "./data/layouts/morse-phonetic-uk-en.js";
 
     let keyboard = new OKeyboard({
       container: '.keyboard',
       layout,
       onKeyDown: (key) => {
-        const code = key && keyboard.layout.table({type: "morse-code", name: "itu"})?.value(key.key);
+        console.log(key)
+        const code = key && keyboard.layout.table({type: "morse-code", name: "uk-legal"})?.value((Array.isArray(key.key) && key.key.flat(2)[0]) || key.key);
         if (code) {
           playMorseCode(code);
         }
