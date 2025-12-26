@@ -134,9 +134,7 @@ export class OKeyboard {
             );
 
         if (!key.labels[i]) {
-          console.log("------------- Generating label", i, key.key);
           key.labels[i] = [];
-            //console.log(`keyCode ${labels[i].keyCode?.type} - ${keyCodeTable?.type}`);
           if (labels[i].codeTable?.type === codeTable?.type && labels[i].codeTable?.name !== codeTable?.name) {
             this.layout.table(labels[i].codeTable).values.filter(l => keyCodes?.some(k => k.value === l.value))
               .map(l => this.layout.table(labels[i].valueTable)?.values.find(m => m.key === l.key && m.value !== codeTable.values.find(n => n.key === l.key)?.value))
@@ -146,25 +144,10 @@ export class OKeyboard {
             this.layout.table(labels[i].valueTable)?.values.filter(l => keyCodes?.length? keyCodes.some(k => k.key === l.key): l.key === key.key)
               .forEach(l => [ l.value, ...(l.altValues || []) ].forEach(l => key.labels[i].push(tCaseFunc(l))));
           }
-            console.log(JSON.stringify(key.labels[i]))
-          //if (i == mainLabel.position) key.labels[i] = [tCaseFunc(key.letter)];
-          /*else if (labels[i].type === "letter") key.labels[i] = labels[i].table?.values?.filter(l => l.code === key.code && l.letter !== key.letter)?.map(l => tCaseFunc(l.letter));
-          else if (labels[i].type === "phoneticAlphabet") {
-            let f = labels[i].phoneticData?.letters?.find(l => l.letter === key.letter);
-            if (f) {
-              if (f.altNames) key.labels[i] = [ f.name, ...f.altNames ];
-              else key.labels[i] = [ f.name ];
-            }
-          }*/
-        } else {
-          console.log("Processing label", i, key.key, key.labels[i]);
+        }
+        else {
           if (!Array.isArray(key.labels[i])) key.labels[i] = [key.labels[i]];
         }
-        //key.labels[i] = key.labels[i].map(t => {
-        //  return ((t && labels[i].table?.values?.filter(l => (Array.isArray(t))? t.flat(2).includes(l.key): l.key === t)) || labels[i].table?.values?.filter(l => (keyCode? l.key === keyCode.key: l.key === key.key) && l.value !== key.key))?.map(l => tCaseFunc(l.letter)).join("</tspan><tspan> </tspan><tspan>") || "";
-          //else if (labels[i].type === "phoneticAlphabet") t = labels[i].phoneticData?.letters?.find(l => l.letter === (t || key.letter))?.name || t || "";
-          //return t;
-        //});
       }
 
       if (typeof key.row !== "number") {
@@ -267,7 +250,6 @@ export class OKeyboard {
   _physicalKeyDown(event) {
     const keyName = (event.key || "").toLowerCase();
     const key = this.layout.keys.find(k => Array.isArray(k.key)? k.key.flat(2).includes(keyName): k.key === keyName);
-    console.log("Physical key down:", keyName, key);
     if (!key || key.pressed || key.disabled) return;
     key.pressed = +(Date.now());
     const element = this.container.querySelector(`.key[data-key="${key.key}"]`);
