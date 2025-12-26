@@ -87,34 +87,23 @@ export class OKeyboard {
    * @returns {void}
    */
   render() {
-    const labelsLength = this.layout.labels?.length || 9;
-    const labelPositions = this.layout.labels?.map(l => parseInt(l?.position) || 0) || [];
-    const labels = [];
+    const labels = this.layout.labels;
     const styles = [];
     let html = "";
     let longestRowSize = 0;
 
-    for (let i = 0, j = 0; i < labelsLength; i++) {
-      while (labelPositions.includes(j)) j++;
-      if (typeof labelPositions[i] !== "number") labelPositions[i] = j;
-      labels[i] = this.layout.labels?.[i] || {};
-      labels[i].position = labelPositions[i];
-      if (!labels[i].type) labels[i].type = "undefined";
-      else if (labels[i].tableName) {
-        labels[i].table = this.layout.tables.find(t => t.type === labels[i].type && t.name === labels[i].tableName);
-      }
-      if (labels[i].keyCode && labels[i].keyCode.type && labels[i].keyCode.tableName) {
-        labels[i].keyCode.table = this.layout.tables.find(t => t.type === labels[i].keyCode.type && t.name === labels[i].keyCode.tableName);
-      }
+    for (let i = 0; i < labels.length; i++) {
+      if (labels[i].valueTable) labels[i]._valueTable = this.layout.table(labels[i].valueTable);
+      if (labels[i].codeTable) labels[i]._codeTable = this.layout.table(labels[i].codeTable);
       if (labels[i].size) {
         styles.push(`.key button svg .${labels[i].position ? 'key-alt-label-' + labels[i].position : 'key-label'} tspan { font-size: ${labels[i].size}em; }`);
       }
     }
 
-    const mainLabel = labels.find(l => l.isMain) || labels.find(l => l.keyCode) || labels.find(l => l.type === "letter");
+    const mainLabel = labels.find(l => l.isMain) || labels.find(l => l.codeTable) || labels.find(l => l.type === "letter");
     if (mainLabel) mainLabel.isMain = true;
 
-    const keyCodeTable = (labels.find(l => l.isMain && l.keyCode) || labels.find(l => !l.position && l.keyCode) || labels.find(l => l.keyCode))?.keyCode?.table;
+    const codeTable = this.layout.table((labels.find(l => l.isMain && l.codeTable) || labels.find(l => !l.position && l.codeTable) || labels.find(l => l.codeTable))?.codeTable);
     
     if (!this.layout.rows) this.layout.rows = [];
 
@@ -132,11 +121,11 @@ export class OKeyboard {
     }
     this.layout.keys.forEach(key => {
       if (!key) key = {};
-      const keyCode = keyCodeTable?.values?.find(l => typeof key.key === "string"? l.key === key.key: Array.isArray(key.key)? key.key.flat(2).includes(l.key): false);
+      const keyCode = codeTable?.values?.find(l => typeof key.key === "string"? l.key === key.key: Array.isArray(key.key)? key.key.flat(2).includes(l.key): false);
       if (!key.code && keyCode?.value) key.code = keyCode?.value;
       if (!key.labels) key.labels = [];
 
-      for (let i = 0; i < labelsLength; i++) {
+      for (let i = 0; i < labels.length; i++) {
         const tCaseFunc = labels[i].case === "upper"
           ? t => (t?.toUpperCase && t.toUpperCase()) || t
           : ( labels[i].case === "lower"
@@ -148,14 +137,13 @@ export class OKeyboard {
           console.log("------------- Generating label", i, key.key);
           key.labels[i] = [];
             //console.log(`keyCode ${labels[i].keyCode?.type} - ${keyCodeTable?.type}`);
-          if (labels[i].keyCode?.type === keyCodeTable?.type && labels[i].keyCode?.tableName !== keyCodeTable?.name) {
-            console.log(keyCodeTable)
-            labels[i].keyCode.table.values.filter(l => l.value === keyCode?.value)
-              .map(l => labels[i].table.values.find(m => m.key === l.key && m.value !== keyCodeTable.values.find(n => n.key === l.key)?.value))
+          if (labels[i].codeTable?.type === codeTable?.type && labels[i].codeTable?.name !== codeTable?.name) {
+            this.layout.table(labels[i].codeTable).values.filter(l => l.value === keyCode?.value)
+              .map(l => this.layout.table(labels[i].valueTable)?.values.find(m => m.key === l.key && m.value !== codeTable.values.find(n => n.key === l.key)?.value))
               .forEach(l => l && key.labels[i].push(tCaseFunc(l.value)));
           }
-          else if (labels[i].table?.values) {
-            labels[i].table.values.filter(l => keyCode? l.key === keyCode.key: l.key === key.key)
+          else if (labels[i].valueTable) {
+            this.layout.table(labels[i].valueTable)?.values.filter(l => keyCode? l.key === keyCode.key: l.key === key.key)
               .forEach(l => [ l.value, ...(l.altValues || []) ].forEach(l => key.labels[i].push(tCaseFunc(l))));
           }
             console.log(JSON.stringify(key.labels[i]))
@@ -205,7 +193,7 @@ export class OKeyboard {
         html += `<div class="keycolumn">`;
         column.keys.forEach(key => {
           let keyHTML = "";
-          for (let i = 0; i < labelsLength; i++) {
+          for (let i = 0; i < labels.length; i++) {
             keyHTML += `<text class="${labels[i].position? 'key-alt-label key-alt-label-' + labels[i].position: 'key-label'}">` +
               key.labels[i]?.map((t, j) => `<tspan${labels[i].direction === "column"? ' x="0" dy="' + ((j? 1: 1 - key.labels[i].length) * 30 * 1.1 * labels[i].size).toFixed(1) + '"': (j? ' dx="' + (30 * 0.2 * labels[i].size).toFixed(1) + '"': '')}>${t}</tspan>`).join("") +
               `</text>`;
