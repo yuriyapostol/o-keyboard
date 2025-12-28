@@ -1,9 +1,9 @@
-import * as lettersEn from '../tables/letters/en.js';
-import * as lettersUk from '../tables/letters/uk.js';
-import * as morseItu from '../tables/morse-codes/itu.js';
-import * as morseUkLegal from '../tables/morse-codes/uk-legal.js';
-import * as phoneticNato from '../tables/phonetic-alphabets/nato.js';
-import * as phoneticUk from '../tables/phonetic-alphabets/uk.js';
+import * as lettersEn from '../../tables/letters/en.js';
+import * as lettersUk from '../../tables/letters/uk.js';
+import * as morseItu from '../../tables/morse-codes/itu.js';
+import * as morseUkLegal from '../../tables/morse-codes/uk-legal.js';
+import * as phoneticNato from '../../tables/phonetic-alphabets/nato.js';
+import * as phoneticUk from '../../tables/phonetic-alphabets/uk.js';
 
 export const layout = {
   name: "en-uk",
