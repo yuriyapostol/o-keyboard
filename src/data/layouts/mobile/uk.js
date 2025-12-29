@@ -1,10 +1,11 @@
-import * as lettersUk from '../../tables/letters/uk.js';
+import * as lettersUk from '../../tables/characters/uk.js';
+import * as typographical from '../../tables/characters/typographical.js';
 
 export const layout = {
-  name: "uk-letters",
+  name: "uk",
   title: "Українська",
   labels: [
-    { valueTable: "letter/uk", case: "upper" },
+    { valueTable: "characters/uk"/*, "characters/typographical"]*/, case: "upper" },
   ],
   keys: [
     ["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ї"],
@@ -14,5 +15,6 @@ export const layout = {
   //hilightedKeys: ["а", "ф", "с", "т"],
   tables: [
     lettersUk.table,
+    typographical.table
   ]
 };

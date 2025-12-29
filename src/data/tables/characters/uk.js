@@ -1,6 +1,6 @@
 export const table = {
   name: "uk",
-  type: "letter",
+  type: "characters",
   language: "uk",
   title: "Ukrainian",
   values: [
