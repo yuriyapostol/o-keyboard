@@ -6,7 +6,7 @@
  */
 
 import { OKeyboardLayout } from "./layout.js";
-import { OKeyboardTable } from "./table.js";
+//import { OKeyboardTable } from "./table.js";
 
 export class OKeyboard {
   /**
@@ -93,17 +93,17 @@ export class OKeyboard {
     let longestRowSize = 0;
 
     for (let i = 0; i < labels.length; i++) {
-      if (labels[i].valueTable) labels[i]._valueTable = this.layout.table(labels[i].valueTable);
-      if (labels[i].codeTable) labels[i]._codeTable = this.layout.table(labels[i].codeTable);
+      //if (labels[i].valueTable?.length) labels[i].valueTable.forEach(t => t = this.layout.table(t));
+      if (labels[i].codeTable) labels[i]._codeTable = this.layout.tables.find(labels[i].codeTable);
       if (labels[i].size) {
         styles.push(`.key button svg .${labels[i].position ? 'key-alt-label-' + labels[i].position : 'key-label'} tspan { font-size: ${labels[i].size}em; }`);
       }
     }
 
-    const mainLabel = labels.find(l => l.isMain) || labels.find(l => l.codeTable) || labels.find(l => l.type === "letter");
+    const mainLabel = labels.find(l => l.isMain) || labels.find(l => l.codeTable) || labels[0];
     if (mainLabel) mainLabel.isMain = true;
 
-    const codeTable = this.layout.table((labels.find(l => l.isMain && l.codeTable) || labels.find(l => !l.position && l.codeTable) || labels.find(l => l.codeTable))?.codeTable);
+    const codeTable = this.layout.tables.find((labels.find(l => l.isMain && l.codeTable) || labels.find(l => !l.position && l.codeTable) || labels.find(l => l.codeTable))?.codeTable);
     
     if (!this.layout.rows) this.layout.rows = [];
 
@@ -119,6 +119,7 @@ export class OKeyboard {
         row++;
       }
     }
+
     this.layout.keys.forEach(key => {
       if (!key) key = {};
       const keyCodes = codeTable?.values?.filter(l => typeof key.key === "string"? l.key === key.key: (Array.isArray(key.key)? key.key.flat(2).includes(l.key): false));
@@ -136,12 +137,12 @@ export class OKeyboard {
         if (!key.labels[i]) {
           key.labels[i] = [];
           if (labels[i].codeTable?.type === codeTable?.type && labels[i].codeTable?.name !== codeTable?.name) {
-            this.layout.table(labels[i].codeTable).values.filter(l => keyCodes?.some(k => k.value === l.value))
-              .map(l => this.layout.table(labels[i].valueTable)?.values.find(m => m.key === l.key && m.value !== codeTable.values.find(n => n.key === l.key)?.value))
+            this.layout.tables.find(labels[i].codeTable).values.filter(l => keyCodes?.some(k => k.value === l.value))
+              .map(l => labels[i].valueTable?.values.find(m => m.key === l.key && m.value !== codeTable.values.find(n => n.key === l.key)?.value))
               .forEach(l => l && key.labels[i].push(tCaseFunc(l.value)));
           }
-          else if (labels[i].valueTable) {
-            this.layout.table(labels[i].valueTable)?.values.filter(l => keyCodes?.length? keyCodes.some(k => k.key === l.key): l.key === key.key)
+          else if (labels[i].valueTable?.values?.length) {
+            labels[i].valueTable.values.filter(l => keyCodes?.length? keyCodes.some(k => k.key === l.key): l.key === key.key)
               .forEach(l => [ l.value, ...(l.altValues || []) ].forEach(l => key.labels[i].push(tCaseFunc(l))));
           }
         }

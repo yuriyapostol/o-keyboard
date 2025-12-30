@@ -1,4 +1,4 @@
-import { OKeyboardTable } from "./table.js";
+import { OKeyboardTable, OKeyboardTables } from "./table.js";
 
 export class OKeyboardLayout {
   constructor(props = {}) {
@@ -7,7 +7,7 @@ export class OKeyboardLayout {
     }
 
     this.labels = [];
-    this.tables = [];
+    this.tables = new OKeyboardTables();
     this.set(props);
   }
 
@@ -21,8 +21,7 @@ export class OKeyboardLayout {
     if (Object.keys(rest).length) Object.assign(this, rest);
 
     if (tables) {
-      this.tables = [];
-      tables.forEach(t => this.table(t));
+      this.tables = new OKeyboardTables(tables);
     }
 
     if (labels) {
@@ -41,18 +40,31 @@ export class OKeyboardLayout {
         if (typeof labelPositions[i] !== "number") labelPositions[i] = j;
         labels[i].position = labelPositions[i];
 
-        if (!labels[i].valueTable) labels[i].valueTable = null;
-        else if (typeof labels[i].valueTable === "string") labels[i].valueTable = OKeyboardTable.parseName(labels[i].valueTable);
-        else if (typeof labels[i].valueTable === "object") {
-          const { type = labels[i].valueTable.type, name } = OKeyboardTable.parseName(labels[i].valueTable.name);
-          labels[i].valueTable = { type, name };
-        }
         if (labels[i].valueTable) {
-          if (!labels[i].valueTable.type || !labels[i].valueTable.name) {
-            throw new Error("OKeyboardLayout: labels[" + i + "].valueTable is invalid");
+          if (Array.isArray(labels[i].valueTable)) {
+            labels[i].valueTable.forEach((t, j) => {
+              t = OKeyboardTables.parseName(t);
+              if (!t.type || !t.name) {
+                throw new Error("OKeyboardLayout: labels[" + i + "].valueTable[" + j + "] is invalid");
+              }
+              t = this.tables.find(t);
+              if (!t) {
+                throw new Error("OKeyboardLayout: labels[" + i + "].valueTable[" + j + "] not found");
+              }
+              labels[i].valueTable[j] = t;
+            });
+            labels[i].valueTable.values = this.tables.filter(labels[i].valueTable).mergedValues();
           }
-          if (! this.table(labels[i].valueTable)) {
-            throw new Error("OKeyboardLayout: labels[" + i + "].valueTable not found");
+          else {
+            let t = OKeyboardTables.parseName(labels[i].valueTable);
+            if (!t.type || !t.name) {
+              throw new Error("OKeyboardLayout: labels[" + i + "].valueTable is invalid");
+            }
+            t = this.tables.find(t);
+            if (!t) {
+              throw new Error("OKeyboardLayout: labels[" + i + "].valueTable not found");
+            }
+            labels[i].valueTable = t;
           }
         }
 
@@ -80,14 +92,14 @@ export class OKeyboardLayout {
    * @param {string | Object} table
    * @return {OKeyboardTable}
    */
-  table(table) {
+  /*table(table) {
     if (typeof table === "string") {
-      const { type, name } = OKeyboardTable.parseName(table);
+      const { type, name } = OKeyboardTables.parseName(table);
       return this.tables.find(t => (!type || t.type === type) && t.name === name);
     }
 
     if (typeof table === "object") {
-      let { type = table.type, name } = OKeyboardTable.parseName(table.name);
+      let { type = table.type, name } = OKeyboardTables.parseName(table.name);
 
       if (!name) {
         throw new Error("OKeyboardLayout.table(): table.name is required");
@@ -107,5 +119,5 @@ export class OKeyboardLayout {
       this.tables.push(created);
       return created;
     }
-  }
+  }*/
 }

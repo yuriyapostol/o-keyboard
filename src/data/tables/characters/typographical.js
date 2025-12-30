@@ -7,6 +7,5 @@ export const table = {
     { key: "," },
     { key: "'" },
     { key: "\"" },
-    { key: "e" },
   ]
 };

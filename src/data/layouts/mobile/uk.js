@@ -5,7 +5,7 @@ export const layout = {
   name: "uk",
   title: "Українська",
   labels: [
-    { valueTable: "characters/uk"/*, "characters/typographical"]*/, case: "upper" },
+    { valueTable: ["characters/uk", "characters/typographical"], case: "upper" },
   ],
   keys: [
     ["й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ї"],
