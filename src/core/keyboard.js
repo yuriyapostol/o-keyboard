@@ -94,7 +94,7 @@ export class OKeyboard {
 
     for (let i = 0; i < labels.length; i++) {
       //if (labels[i].valueTable?.length) labels[i].valueTable.forEach(t => t = this.layout.table(t));
-      if (labels[i].codeTable) labels[i]._codeTable = this.layout.tables.find(labels[i].codeTable);
+      //if (labels[i].codeTable) labels[i]._codeTable = this.layout.tables.find(labels[i].codeTable);
       if (labels[i].size) {
         styles.push(`.key button svg .${labels[i].position ? 'key-alt-label-' + labels[i].position : 'key-label'} tspan { font-size: ${labels[i].size}em; }`);
       }
@@ -103,7 +103,7 @@ export class OKeyboard {
     const mainLabel = labels.find(l => l.isMain) || labels.find(l => l.codeTable) || labels[0];
     if (mainLabel) mainLabel.isMain = true;
 
-    const codeTable = this.layout.tables.find((labels.find(l => l.isMain && l.codeTable) || labels.find(l => !l.position && l.codeTable) || labels.find(l => l.codeTable))?.codeTable);
+    //const codeTable = this.layout.tables.find((labels.find(l => l.isMain && l.codeTable) || labels.find(l => !l.position && l.codeTable) || labels.find(l => l.codeTable))?.codeTable);
     
     if (!this.layout.rows) this.layout.rows = [];
 

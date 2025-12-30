@@ -1,5 +1,6 @@
-import * as lettersEn from '../../tables/letters/en.js';
-import * as lettersUk from '../../tables/letters/uk.js';
+import * as lettersEn from '../../tables/characters/en.js';
+import * as lettersUk from '../../tables/characters/uk.js';
+import * as numbers from '../../tables/characters/numbers.js';
 import * as morseItu from '../../tables/morse-codes/itu.js';
 import * as morseUkLegal from '../../tables/morse-codes/uk-legal.js';
 import * as phoneticNato from '../../tables/phonetic-alphabets/nato.js';
@@ -9,8 +10,8 @@ export const layout = {
   name: "en-uk",
   title: "Morse Code + Phonetic Alphabet: English + Ukrainian, QWERTY",
   labels: [
-    { valueTable: "letter/en", case: "upper", codeTable: "morse-code/itu" },
-    { valueTable: "letter/uk", position: 2, size: 0.8, case: "upper", codeTable: "morse-code/uk-legal" },
+    { valueTable: ["characters/en", "characters/numbers"], case: "upper", codeTable: "morse-code/itu" },
+    { valueTable: ["characters/uk", "characters/numbers"], position: 2, size: 0.8, case: "upper", codeTable: "morse-code/uk-legal" },
     { valueTable: "phonetic-alphabet/nato", position: 7, size: 0.6, direction: "column" },
   ],
   keys: [
@@ -53,6 +54,7 @@ export const layout = {
   tables: [
     lettersEn.table,
     lettersUk.table,
+    numbers.table,
     morseItu.table,
     morseUkLegal.table,
     phoneticNato.table,

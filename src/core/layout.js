@@ -68,56 +68,20 @@ export class OKeyboardLayout {
           }
         }
 
-        if (typeof labels[i].codeTable === "string") labels[i].codeTable = OKeyboardTable.parseName(labels[i].codeTable);
-        else if (typeof labels[i].codeTable === "object") {
-          const { type = labels[i].codeTable.type, name } = OKeyboardTable.parseName(labels[i].codeTable.name);
-          labels[i].codeTable = { type, name };
-        }
         if (labels[i].codeTable) {
-          if (!labels[i].codeTable.type || !labels[i].codeTable.name) {
+          let t = OKeyboardTables.parseName(labels[i].codeTable);
+          if (!t.type || !t.name) {
             throw new Error("OKeyboardLayout: labels[" + i + "].codeTable is invalid");
           }
-          if (! this.table(labels[i].codeTable)) {
+          t = this.tables.find(t);
+          if (!t) {
             throw new Error("OKeyboardLayout: labels[" + i + "].codeTable not found");
           }
+          labels[i].codeTable = t;
         }
       }
     }
 
     return this;
   }
-
-  /**
-   * Get or set table in this layout
-   * @param {string | Object} table
-   * @return {OKeyboardTable}
-   */
-  /*table(table) {
-    if (typeof table === "string") {
-      const { type, name } = OKeyboardTables.parseName(table);
-      return this.tables.find(t => (!type || t.type === type) && t.name === name);
-    }
-
-    if (typeof table === "object") {
-      let { type = table.type, name } = OKeyboardTables.parseName(table.name);
-
-      if (!name) {
-        throw new Error("OKeyboardLayout.table(): table.name is required");
-      }
-      if (!type) {
-        throw new Error("OKeyboardLayout.table(): table.type is required");
-      }
-
-      let existing = this.tables.find(t => t.type === type && t.name === name);
-
-      if (existing) {
-        existing.set({ ...table, type, name });
-        return existing;
-      }
-
-      const created = new OKeyboardTable({ ...table, type, name });
-      this.tables.push(created);
-      return created;
-    }
-  }*/
 }
