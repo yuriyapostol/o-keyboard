@@ -9,9 +9,9 @@ export const layout = {
   name: "uk-en",
   title: "Morse Code + Phonetic Alphabet: Ukrainian + English, QWERTY",
   labels: [
-    { valueTable: "letter/uk", case: "upper", codeTable: "morse-code/uk-legal" },
-    { valueTable: "letter/en", position: 2, size: 0.8, case: "upper", codeTable: "morse-code/itu" },
-    { valueTable: "phonetic-alphabet/uk", position: 7, size: 0.6 },
+    { labelTable: "letter/uk", case: "upper", valueTable: "morse-code/uk-legal" },
+    { labelTable: "letter/en", position: 2, size: 0.8, case: "upper", valueTable: "morse-code/itu" },
+    { labelTable: "phonetic-alphabet/uk", position: 7, size: 0.6 },
   ],
   keys: [
     ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],

@@ -38,9 +38,7 @@ export class OKeyboardTableRows extends Array {
   constructor(rows) {
     super();
     if (typeof rows === "number") {
-      if (rows > 0) {
-        throw new Error("OKeyboardTableRows: empty rows are not supported");
-      }
+      this.length = rows;
     }
     else if (rows?.length) {
       rows.forEach(r => this.push(new OKeyboardTableRow(r)));
@@ -49,10 +47,17 @@ export class OKeyboardTableRows extends Array {
 
   /**
    * Push row(s) to this collection
-   * @param  {...(Object | string)} rows
+   * @param  {...(OKeyboardTableRow | Object | string)} rows
    */
   push(...rows) {
-    rows.forEach(r => super.push(new OKeyboardTableRow(r)));
+    rows.forEach(r => {
+      if (r instanceof OKeyboardTableRow) {
+        super.push(r);
+      }
+      else {
+        super.push(new OKeyboardTableRow(r));
+      }
+    });
     return this.length;
   }
 
@@ -139,12 +144,10 @@ export class OKeyboardTables extends Array {
    * Create table collection
    * @param {Array | number} [tables]
    */
-  constructor(tables = []) {
+  constructor(tables) {
     super();
     if (typeof tables === "number") {
-      if (tables > 0) {
-        throw new Error("OKeyboardTables: empty tables are not supported");
-      }
+      this.length = tables;
     }
     else if (tables?.length) {
       tables.forEach(t => this.push(new OKeyboardTable(t)));

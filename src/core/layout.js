@@ -40,44 +40,44 @@ export class OKeyboardLayout {
         if (typeof labelPositions[i] !== "number") labelPositions[i] = j;
         labels[i].position = labelPositions[i];
 
-        if (labels[i].valueTable) {
-          if (Array.isArray(labels[i].valueTable)) {
-            labels[i].valueTable.forEach((t, j) => {
+        if (labels[i].labelTable) {
+          if (Array.isArray(labels[i].labelTable)) {
+            labels[i].labelTable.forEach((t, j) => {
               t = OKeyboardTables.parseName(t);
               if (!t.type || !t.name) {
-                throw new Error("OKeyboardLayout: labels[" + i + "].valueTable[" + j + "] is invalid");
+                throw new Error("OKeyboardLayout: labels[" + i + "].labelTable[" + j + "] is invalid");
               }
               t = this.tables.find(t);
               if (!t) {
-                throw new Error("OKeyboardLayout: labels[" + i + "].valueTable[" + j + "] not found");
+                throw new Error("OKeyboardLayout: labels[" + i + "].labelTable[" + j + "] not found");
               }
-              labels[i].valueTable[j] = t;
+              labels[i].labelTable[j] = t;
             });
-            labels[i].valueTable.values = this.tables.filter(labels[i].valueTable).mergedValues();
+            labels[i].labelTable.values = this.tables.filter(labels[i].labelTable).mergedValues();
           }
           else {
-            let t = OKeyboardTables.parseName(labels[i].valueTable);
+            let t = OKeyboardTables.parseName(labels[i].labelTable);
             if (!t.type || !t.name) {
-              throw new Error("OKeyboardLayout: labels[" + i + "].valueTable is invalid");
+              throw new Error("OKeyboardLayout: labels[" + i + "].labelTable is invalid");
             }
             t = this.tables.find(t);
             if (!t) {
-              throw new Error("OKeyboardLayout: labels[" + i + "].valueTable not found");
+              throw new Error("OKeyboardLayout: labels[" + i + "].labelTable not found");
             }
-            labels[i].valueTable = t;
+            labels[i].labelTable = t;
           }
         }
 
-        if (labels[i].codeTable) {
-          let t = OKeyboardTables.parseName(labels[i].codeTable);
+        if (labels[i].valueTable) {
+          let t = OKeyboardTables.parseName(labels[i].valueTable);
           if (!t.type || !t.name) {
-            throw new Error("OKeyboardLayout: labels[" + i + "].codeTable is invalid");
+            throw new Error("OKeyboardLayout: labels[" + i + "].valueTable is invalid");
           }
           t = this.tables.find(t);
           if (!t) {
-            throw new Error("OKeyboardLayout: labels[" + i + "].codeTable not found");
+            throw new Error("OKeyboardLayout: labels[" + i + "].valueTable not found");
           }
-          labels[i].codeTable = t;
+          labels[i].valueTable = t;
         }
       }
     }

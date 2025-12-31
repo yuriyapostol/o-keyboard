@@ -10,12 +10,12 @@ export const layout = {
   name: "en-uk",
   title: "Morse Code + Phonetic Alphabet: English + Ukrainian, QWERTY",
   labels: [
-    { valueTable: ["characters/en", "characters/numbers"], case: "upper", codeTable: "morse-code/itu" },
-    { valueTable: ["characters/uk", "characters/numbers"], position: 2, size: 0.8, case: "upper", codeTable: "morse-code/uk-legal" },
-    { valueTable: "phonetic-alphabet/nato", position: 7, size: 0.6, direction: "column" },
+    { labelTable: ["characters/en", "characters/numbers"], case: "upper", valueTable: "morse-code/itu" },
+    { labelTable: ["characters/uk", "characters/numbers"], position: 2, size: 0.8, case: "upper", valueTable: "morse-code/uk-legal" },
+    { labelTable: "phonetic-alphabet/nato", position: 7, size: 0.6, direction: "column" },
   ],
   keys: [
-    { key: "1", row: 0 },
+    { key: "1", labels: [null, " "], row: 0 },
     { key: "2", row: 0 },
     { key: "3", row: 0 },
     { key: "4", row: 0 },
