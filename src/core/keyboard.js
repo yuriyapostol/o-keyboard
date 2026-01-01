@@ -135,7 +135,7 @@ export class OKeyboard {
         if (!key.labels[i]) {
           key.labels[i] = [];
           if (labels[i].valueTable?.type === valueTable?.type && labels[i].valueTable?.name !== valueTable?.name) {
-            this.layout.tables.find(labels[i].valueTable).values.filter(l => keyValues?.some(k => k.value === l.value))
+            labels[i].valueTable.values.filter(l => keyValues?.some(k => k.value === l.value))
               .map(l => labels[i].labelTable?.values.find(m => m.key === l.key && m.value !== valueTable.values.find(n => n.key === l.key)?.value))
               .forEach(l => l && key.labels[i].push(tCaseFunc(l.value)));
           }

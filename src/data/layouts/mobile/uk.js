@@ -2,6 +2,8 @@ import * as lettersUk from '../../tables/characters/uk.js';
 import * as typographical from '../../tables/characters/typographical.js';
 
 export const layout = {
+  type: "mobile",
+  family: "mobile",
   name: "uk",
   title: "Українська",
   labels: [

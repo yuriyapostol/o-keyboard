@@ -7,6 +7,8 @@ import * as phoneticNato from '../../tables/phonetic-alphabets/nato.js';
 import * as phoneticUk from '../../tables/phonetic-alphabets/uk.js';
 
 export const layout = {
+  type: "morse",
+  family: "morse-phonetic",
   name: "en-uk",
   title: "Morse Code + Phonetic Alphabet: English + Ukrainian, QWERTY",
   labels: [
