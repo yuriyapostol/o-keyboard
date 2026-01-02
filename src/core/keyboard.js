@@ -6,7 +6,6 @@
  */
 
 import { OKeyboardLayout } from "./layout.js";
-//import { OKeyboardTable } from "./table.js";
 
 export class OKeyboard {
   /**

@@ -1,3 +1,12 @@
+/**
+ * OKeyboard Layout Module
+ * @module OKeyboardLayout
+ * @description
+ * This module provides classes to manage keyboard layouts.
+ * @author Yuriy Apostol <yuriyapostol@gmail.com>
+ * @license MIT
+ */
+
 import { OKeyboardTable, OKeyboardTables } from "./table.js";
 
 export class OKeyboardLayout {
@@ -32,7 +41,7 @@ export class OKeyboardLayout {
         if (labels[i].labelTable) {
           if (Array.isArray(labels[i].labelTable)) {
             labels[i].labelTable.forEach((t, j) => {
-              t = OKeyboardTables.parseName(t);
+              t = OKeyboardTables.tableName(t);
               if (!t.type || !t.name) {
                 throw new Error("OKeyboardLayout: labels[" + i + "].labelTable[" + j + "] is invalid");
               }
@@ -42,10 +51,10 @@ export class OKeyboardLayout {
               }
               labels[i].labelTable[j] = t;
             });
-            labels[i].labelTable.values = this.tables.filter(labels[i].labelTable).mergedValues();
+            labels[i].labelTable.values = this.tables.filter(labels[i].labelTable).tableValues();
           }
           else {
-            let t = OKeyboardTables.parseName(labels[i].labelTable);
+            let t = OKeyboardTables.tableName(labels[i].labelTable);
             if (!t.type || !t.name) {
               throw new Error("OKeyboardLayout: labels[" + i + "].labelTable is invalid");
             }
@@ -58,7 +67,7 @@ export class OKeyboardLayout {
         }
 
         if (labels[i].valueTable) {
-          let t = OKeyboardTables.parseName(labels[i].valueTable);
+          let t = OKeyboardTables.tableName(labels[i].valueTable);
           if (!t.type || !t.name) {
             throw new Error("OKeyboardLayout: labels[" + i + "].valueTable is invalid");
           }
