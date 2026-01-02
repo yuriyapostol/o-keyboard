@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-import { OKeyboardLayout } from "./layout.js";
+import { OKeyboardLayout, OKeyboardKeyLabels } from "./layout.js";
 
 export class OKeyboard {
   /**
@@ -147,6 +147,7 @@ export class OKeyboard {
           if (!Array.isArray(key.labels[i])) key.labels[i] = [key.labels[i]];
         }
       }
+      key.labels = new OKeyboardKeyLabels(key.labels);
 
       if (typeof key.row !== "number") {
         let defRow = 0;
@@ -176,7 +177,7 @@ export class OKeyboard {
           let keyHTML = "";
           for (let i = 0; i < labels.length; i++) {
             keyHTML += `<text class="${labels[i].position? 'key-alt-label key-alt-label-' + labels[i].position: 'key-label'}">` +
-              key.labels[i]?.map((t, j) => `<tspan${labels[i].direction === "column"? ' x="0" dy="' + ((j? 1: 1 - key.labels[i].length) * 30 * 1.1 * (labels[i].size || 1)).toFixed(1) + '"': (j? ' dx="' + (30 * 0.2 * (labels[i].size || 1)).toFixed(1) + '"': '')}>${t}</tspan>`).join("") +
+              key.labels[i]?.value?.map((t, j) => `<tspan${labels[i].direction === "column"? ' x="0" dy="' + ((j? 1: 1 - key.labels[i].value?.length || 0) * 30 * 1.1 * (labels[i].value?.size || 1)).toFixed(1) + '"': (j? ' dx="' + (30 * 0.2 * (labels[i].value?.size || 1)).toFixed(1) + '"': '')}>${t}</tspan>`).join("") +
               `</text>`;
           }
           html += `<div class="key${key.hilighted? ' key-hilighted': ''}${key.disabled? ' key-disabled': ''}" data-key="${key.key}">` +
