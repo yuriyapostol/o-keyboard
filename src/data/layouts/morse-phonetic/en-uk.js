@@ -17,7 +17,7 @@ export const layout = {
     { labelTable: "phonetic-alphabet/nato", position: 7, size: 0.6, direction: "column" },
   ],
   keys: [
-    { key: "1", labels: [null, " "], row: 0 },
+    { key: "1", labels: [null, ""], row: 0 },
     { key: "2", row: 0 },
     { key: "3", row: 0 },
     { key: "4", row: 0 },

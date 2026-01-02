@@ -131,7 +131,7 @@ export class OKeyboard {
             : t => t
             );
 
-        if (!key.labels[i]) {
+        if (typeof key.labels[i] === "undefined" || key.labels[i] === null) {
           key.labels[i] = [];
           if (labels[i].valueTable?.type === valueTable?.type && labels[i].valueTable?.name !== valueTable?.name) {
             labels[i].valueTable.values.filter(l => keyValues?.some(k => k.value === l.value))
