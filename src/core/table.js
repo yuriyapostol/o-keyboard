@@ -68,7 +68,12 @@ export class OKeyboardTableRow {
  *   { key: "a", value: ".-" },
  *   { key: "b", value: "-..." }
  * ]);
- * console.log(rows); // [ { key: "a", value: ".-" }, { key: "b", value: "-..." } ]
+ * rows.find("a").value = ".-."; // modify row value
+ * console.log(rows);
+ * // [
+ * //   { key: "a", value: ".-." },
+ * //   { key: "b", value: "-..." }
+ * // ]
  */
 export class OKeyboardTableRows extends Array {
   /**
@@ -149,6 +154,11 @@ export class OKeyboardTableRows extends Array {
     }
     return [];
   }
+
+  clear () {
+    this.length = 0;
+    return this;
+  }
 }
 
 /**
@@ -167,11 +177,16 @@ export class OKeyboardTableRows extends Array {
  *     { key: "b", value: "-..." }
  *   ]
  * });
+ * table.values.push({ key: "c", value: "-.-." });
  * console.log(table);
  * // {
  * //   name: "itu",
  * //   type: "morse-code",
- * //   values: [ { key: "a", value: ".-" }, { key: "b", value: "-..." } ]
+ * //   values: [
+ * //     { key: "a", value: ".-" },
+ * //     { key: "b", value: "-..." },
+ * //     { key: "c", value: "-.-." }
+ * //   ]
  * // }
  */
 export class OKeyboardTable {
@@ -231,12 +246,10 @@ export class OKeyboardTable {
  * 
  * // find table by name and get its row keys
  * const keys = tables.find("morse-code/itu")?.values.map(row => row.key);
- * console.log(keys);
  * // [ "a", "b" ]
  * 
  * // filter merged values from all tables
  * const values = tables.tableValues().filter(["a", "c"]);
- * console.log(values);
  * // [ { key: "a", value: ".-" } ]
  */
 export class OKeyboardTables extends Array {
@@ -249,8 +262,8 @@ export class OKeyboardTables extends Array {
     if (typeof tables === "number") {
       this.length = tables;
     }
-    else if (tables?.length) {
-      tables.forEach(t => this.push(new OKeyboardTable(t)));
+    else if (Array.isArray(tables)) {
+      this.push(...tables);
     }
   }
 
@@ -330,6 +343,11 @@ export class OKeyboardTables extends Array {
       return new this.constructor(super.filter(t => (!type || t.type === type) && t.name === name));
     }
     return new this.constructor([]);
+  }
+
+  clear () {
+    this.length = 0;
+    return this;
   }
 
   /**

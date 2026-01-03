@@ -86,7 +86,8 @@ export class OKeyboard {
    * @returns {void}
    */
   render() {
-    const labels = this.layout.labels;
+    const layer = this.layout.layers[0];
+    const labels = layer.labels;
     const styles = [];
     let html = "";
     let longestRowSize = 0;
@@ -102,22 +103,22 @@ export class OKeyboard {
 
     const valueTable = this.layout.tables.find((labels.find(l => l.isMain && l.valueTable) || labels.find(l => !l.position && l.valueTable) || labels.find(l => l.valueTable))?.valueTable);
     
-    if (!this.layout.rows) this.layout.rows = [];
+    if (!layer.rows) layer.rows = [];
 
-    for (let i = 0, row = 0; i < this.layout.keys.length; i++) {
-      if (typeof this.layout.keys[i] === "string") {
-        this.layout.keys[i] = { key: this.layout.keys[i] };
-        if (row) this.layout.keys[i].row = row;
+    for (let i = 0, row = 0; i < layer.keys.length; i++) {
+      if (typeof layer.keys[i] === "string") {
+        layer.keys[i] = { key: layer.keys[i] };
+        if (row) layer.keys[i].row = row;
       }
-      else if (Array.isArray(this.layout.keys[i])) {
-        const l = this.layout.keys[i].length;
-        this.layout.keys.splice(i, 1, ...(this.layout.keys[i]).map(k => { k = { key: k }; if (row) k.row = row; return k; }));
+      else if (Array.isArray(layer.keys[i])) {
+        const l = layer.keys[i].length;
+        layer.keys.splice(i, 1, ...(layer.keys[i]).map(k => { k = { key: k }; if (row) k.row = row; return k; }));
         i += l - 1;
         row++;
       }
     }
 
-    this.layout.keys.forEach(key => {
+    layer.keys.forEach(key => {
       if (!key) key = {};
       const keyValues = valueTable?.values?.filter(l => typeof key.key === "string"? l.key === key.key: (Array.isArray(key.key)? key.key.flat(2).includes(l.key): false));
       if (!key.value && keyValues?.[0]?.value) key.value = keyValues[0].value;
@@ -144,30 +145,30 @@ export class OKeyboard {
           }
         }
         else {
-          if (!Array.isArray(key.labels[i])) key.labels[i] = [key.labels[i]];
+          if (!Array.isArray(key.labels[i]) && typeof key.labels[i] !== "object") key.labels[i] = [key.labels[i]];
         }
       }
       key.labels = new OKeyboardKeyLabels(key.labels);
 
       if (typeof key.row !== "number") {
         let defRow = 0;
-        while (this.layout.keys.filter(k => typeof k.row === "number" && k.row === defRow).length >= (this.layout.rows[defRow]?.maxKeys || this.layout.maxRowKeys || 0xFFFF)) defRow++;
+        while (layer.keys.filter(k => typeof k.row === "number" && k.row === defRow).length >= (layer.rows[defRow]?.maxKeys || layer.maxRowKeys || 0xFFFF)) defRow++;
         key.row = defRow;
       }
-      if (!this.layout.rows[key.row]) this.layout.rows[key.row] = {};
-      if (!this.layout.rows[key.row].columns) this.layout.rows[key.row].columns = [];
+      if (!layer.rows[key.row]) layer.rows[key.row] = {};
+      if (!layer.rows[key.row].columns) layer.rows[key.row].columns = [];
 
       if (typeof key.column !== "number") {
         let defColumn = 0;
-        while (this.layout.keys.filter(k => typeof k.row === "number" && k.row === key.row && typeof k.column === "number" && k.column === defColumn).length >= (this.layout.rows[key.row].columns[defColumn]?.maxKeys || this.layout.maxColumnKeys || 0xFFFF)) defColumn++;
+        while (layer.keys.filter(k => typeof k.row === "number" && k.row === key.row && typeof k.column === "number" && k.column === defColumn).length >= (layer.rows[key.row].columns[defColumn]?.maxKeys || layer.maxColumnKeys || 0xFFFF)) defColumn++;
         key.column = defColumn;
       }
-      if (!this.layout.rows[key.row].columns[key.column]) this.layout.rows[key.row].columns[key.column] = {};
-      if (!this.layout.rows[key.row].columns[key.column].keys) this.layout.rows[key.row].columns[key.column].keys = [];
-      this.layout.rows[key.row].columns[key.column].keys.push(key);
+      if (!layer.rows[key.row].columns[key.column]) layer.rows[key.row].columns[key.column] = {};
+      if (!layer.rows[key.row].columns[key.column].keys) layer.rows[key.row].columns[key.column].keys = [];
+      layer.rows[key.row].columns[key.column].keys.push(key);
     });
 
-    this.layout.rows.forEach(row => {
+    layer.rows.forEach(row => {
       let rowSize = row.columns.reduce((s, c) => s + c.keys.length, 0);
       if (rowSize > longestRowSize) longestRowSize = rowSize;
       html += `<div class="keyrow">`;
@@ -206,7 +207,7 @@ export class OKeyboard {
     this.container.querySelectorAll(".key").forEach(element => {
       const button = element.querySelector("button"),
         keyName = element.getAttribute("data-key"),
-        key = this.layout.keys.find(l => ((Array.isArray(l.key) && l.key.flat(2).join(",")) || l.key) === keyName);
+        key = this.layout.layers[0].keys.find(l => ((Array.isArray(l.key) && l.key.flat(2).join(",")) || l.key) === keyName);
 
       const onMouseDown = (event) => {
         if (!key || key.disabled) return;
@@ -248,7 +249,7 @@ export class OKeyboard {
 
   _physicalKeyDown(event) {
     const keyName = (event.key || "").toLowerCase();
-    const key = this.layout.keys.find(k => Array.isArray(k.key)? k.key.flat(2).includes(keyName): k.key === keyName);
+    const key = this.layout.layers[0].keys.find(k => Array.isArray(k.key)? k.key.flat(2).includes(keyName): k.key === keyName);
     if (!key || key.pressed || key.disabled) return;
     key.pressed = +(Date.now());
     const element = this.container.querySelector(`.key[data-key="${key.key}"]`);
@@ -263,7 +264,7 @@ export class OKeyboard {
 
   _physicalKeyUp(event) {
     const keyName = (event.key || "").toLowerCase();
-    const key = this.layout.keys.find(k => Array.isArray(k.key)? k.key.flat(2).includes(keyName): k.key === keyName);
+    const key = this.layout.layers[0].keys.find(k => Array.isArray(k.key)? k.key.flat(2).includes(keyName): k.key === keyName);
     if (!key) return;
     const element = this.container.querySelector(`.key[data-key="${key.key}"]`);
     if (element) element.classList.remove("key-pressed");
